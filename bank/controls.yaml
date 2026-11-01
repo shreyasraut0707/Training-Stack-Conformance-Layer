@@ -1,0 +1,33 @@
+# G3 controls (spec Section 14): current stable releases, three tokenizer families.
+# Every run must not fail. Intents are only what each stack documents:
+# - TRL SFTTrainer builds labels from a completion mask and pads them separately, so for
+#   prompt-completion data it promises EOS supervision, prompt masking and a single BOS.
+# - DataCollatorForLanguageModeling(mlm=False) sets labels = input_ids and masks every
+#   pad-ID token; it promises neither EOS supervision when PAD = EOS nor prompt masking,
+#   so only single_bos is declared. Its PAD = EOS behaviour is recorded in
+#   docs/m0_findings.md as documented behaviour that surprises users.
+# - M1 adds P3 (TRL applies the chat template), P6 (observation only, never fails) and P7
+#   on TRL. P7 on the Transformers collator is not a control: with a PAD = EOS tokenizer it
+#   fails by design (the same documented behaviour), so it is recorded as an observation.
+venv: conform
+models:
+  - Qwen/Qwen2.5-0.5B-Instruct
+  - HuggingFaceTB/SmolLM2-135M-Instruct
+  - TinyLlama/TinyLlama-1.1B-Chat-v1.0
+runs:
+  - {id: p1-transformers, probe: p1_grad_accum, args: [--trainer, transformers]}
+  - {id: p1-trl, probe: p1_grad_accum, args: [--trainer, trl]}
+  - {id: p2-transformers, probe: p2_loss_tokens,
+     args: [--trainer, transformers, --intent, single_bos=true]}
+  - {id: p2-trl, probe: p2_loss_tokens,
+     args: [--trainer, trl, --data-format, prompt_completion,
+            --intent, supervise_eos=true, --intent, mask_prompt=true, --intent, single_bos=true]}
+  - {id: p3-trl, probe: p3_template, args: [--trainer, trl, --data-format, prompt_completion]}
+  - {id: p6-transformers, probe: p6_precision, args: [--trainer, transformers]}
+  - {id: p6-trl, probe: p6_precision, args: [--trainer, trl]}
+  - {id: p7-trl, probe: p7_eos_stop, args: [--trainer, trl, --data-format, prompt_completion]}
+  # M4 (v0.2) probes
+  - {id: p4-trl, probe: p4_packing, args: [--trainer, trl]}
+  - {id: p5-transformers, probe: p5_resume, args: [--trainer, transformers]}
+  - {id: p5-trl, probe: p5_resume, args: [--trainer, trl]}
+  - {id: p1m-transformers, probe: p1_multiprocess, args: [--trainer, transformers]}

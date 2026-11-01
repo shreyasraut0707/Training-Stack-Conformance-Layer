@@ -1,0 +1,74 @@
+{
+  "probe": "P1M-multiprocess-loss-averaging",
+  "status": "pass",
+  "oracle": "float64 reference over the rows of both processes: summed token loss / total supervised tokens of the step (conform.oracle)",
+  "environment": {
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26300-SP0",
+    "torch": "2.15.0+cpu",
+    "transformers": "5.22.1",
+    "trl": "1.17.1",
+    "peft": "0.21.2",
+    "accelerate": "1.15.0",
+    "datasets": "5.1.0",
+    "device": "cpu (2 processes, gloo)",
+    "dtype": "float32",
+    "seeds": {
+      "proxy": 0,
+      "trainer": 0
+    }
+  },
+  "reproducer": "python -m conform.probes.p1_multiprocess TinyLlama/TinyLlama-1.1B-Chat-v1.0 --seed 0",
+  "findings": [
+    {
+      "evidence_class": "seen",
+      "claim": "The update averaged across 2 processes differs from the float64 reference by 3.54e-07 (floor 3.63e-07; supervised tokens per process [14, 8])",
+      "evidence": {
+        "metric": "update",
+        "deviation": 3.543853950326888e-07,
+        "floor": 3.632781825970282e-07,
+        "verdict": "inside",
+        "tokens_per_process": [
+          14,
+          8
+        ]
+      },
+      "rule": null
+    }
+  ],
+  "observed": {
+    "proxy": {
+      "model_id": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+      "model_type": "llama",
+      "revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+      "vocab_size": 32000,
+      "tokenizer_len": 32000,
+      "num_hidden_layers": 2,
+      "hidden_size": 64,
+      "seed": 0,
+      "pad_token_id": 2,
+      "eos_token_id": 2,
+      "bos_token_id": 1,
+      "pad_equals_eos": true
+    },
+    "rows_per_process": [
+      0,
+      1
+    ],
+    "tokens_per_process": [
+      14,
+      8
+    ],
+    "deviation": 3.543853950326888e-07,
+    "floor": 3.632781825970282e-07,
+    "trainer_args": {}
+  },
+  "noise_floor": 3.632781825970282e-07,
+  "declared_intent": null,
+  "limitations": [
+    "proxy model; real weights not used",
+    "two processes on one CPU with the gloo backend; multi-GPU, NCCL, DeepSpeed and FSDP are not tested",
+    "Transformers Trainer only; the update is the averaged gradient handed to the optimizer (plain SGD)"
+  ],
+  "reason": null
+}

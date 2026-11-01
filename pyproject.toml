@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+# "conform" is the spec's working name. It is taken on PyPI (checked 2026-11-01), so it
+# must be replaced by the owner's final choice before the first upload (docs/publishing_steps.md).
+name = "conform"
+version = "0.2.0.dev0"
+description = "Executable conformance probes for LLM fine-tuning stacks (TRL, Transformers)"
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+requires-python = ">=3.11"
+dependencies = [
+    "pyyaml",
+]
+
+[project.optional-dependencies]
+# The stack under test. Not pinned on purpose: the tool records whatever is installed.
+stack = [
+    "torch",
+    "transformers",
+    "trl",
+    "accelerate",
+    "peft",
+    "datasets",
+]
+dev = [
+    "pytest",
+]
+# The MCP server for coding agents (spec Section 9); works with mcp 1.x and 2.x.
+mcp = [
+    "mcp>=1.26",
+]
+
+[project.scripts]
+conform = "conform.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+conform = ["skills/conform/SKILL.md"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,121 @@
+{
+  "probe": "P1-grad-accum-equivalence",
+  "status": "fail",
+  "oracle": "float64 reference: summed token loss over non-ignored labels / total non-ignored tokens of the whole batch (conform.oracle)",
+  "environment": {
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26300-SP0",
+    "torch": "2.4.1",
+    "transformers": "4.45.2",
+    "trl": null,
+    "peft": null,
+    "accelerate": "1.0.1",
+    "datasets": null,
+    "device": "cpu",
+    "dtype": "float32",
+    "seeds": {
+      "proxy": 0,
+      "trainer": 0
+    }
+  },
+  "reproducer": "python -m conform.probes.p1_grad_accum HuggingFaceTB/SmolLM2-135M-Instruct --trainer transformers --seed 0",
+  "findings": [
+    {
+      "evidence_class": "seen",
+      "claim": "accumulated (4 micro-batches x 1 row): loss differs from the float64 reference by 0.00251 (floor 1.19e-07, pass up to 2.38e-07, fail above 1.19e-06)",
+      "evidence": {
+        "run": "accumulated (4 micro-batches x 1 row)",
+        "metric": "loss",
+        "deviation": 0.0025074165676714695,
+        "floor": 1.1920928955078125e-07,
+        "verdict": "above"
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "accumulated (4 micro-batches x 1 row): update differs from the float64 reference by 0.631 (floor 4.45e-07, pass up to 8.91e-07, fail above 4.45e-06)",
+      "evidence": {
+        "run": "accumulated (4 micro-batches x 1 row)",
+        "metric": "update",
+        "deviation": 0.6310132754841614,
+        "floor": 4.4540923149936487e-07,
+        "verdict": "above"
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "one batch (1 x 4 rows): loss differs from the float64 reference by 1.23e-07 (floor 1.19e-07, pass up to 2.38e-07, fail above 1.19e-06)",
+      "evidence": {
+        "run": "one batch (1 x 4 rows)",
+        "metric": "loss",
+        "deviation": 1.2324031480063837e-07,
+        "floor": 1.1920928955078125e-07,
+        "verdict": "inside"
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "one batch (1 x 4 rows): update differs from the float64 reference by 4.47e-07 (floor 4.45e-07, pass up to 8.91e-07, fail above 4.45e-06)",
+      "evidence": {
+        "run": "one batch (1 x 4 rows)",
+        "metric": "update",
+        "deviation": 4.4662177023100275e-07,
+        "floor": 4.4540923149936487e-07,
+        "verdict": "inside"
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "inferred",
+      "claim": "Training with these settings does not optimise the same objective as one large batch",
+      "evidence": {},
+      "rule": "a loss or update clearly above the noise floor means the runs are not equivalent"
+    }
+  ],
+  "observed": {
+    "trainer": "Transformers Trainer",
+    "proxy": {
+      "model_id": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "model_type": "llama",
+      "revision": "12fd25f77366fa6b3b4b768ec3050bf629380bac",
+      "vocab_size": 49152,
+      "tokenizer_len": 49152,
+      "num_hidden_layers": 2,
+      "hidden_size": 64,
+      "seed": 0,
+      "pad_token_id": 2,
+      "eos_token_id": 2,
+      "bos_token_id": 1,
+      "pad_equals_eos": true
+    },
+    "supervised_targets_per_row": [
+      14,
+      8,
+      4,
+      3
+    ],
+    "reference_loss": 10.84718379807735,
+    "floor_loss": 1.1920928955078125e-07,
+    "floor_update": 4.4540923149936487e-07,
+    "pass_band": 2.0,
+    "multiplier": 10.0,
+    "accumulated (4 micro-batches x 1 row): loss": 10.819985389709473,
+    "accumulated (4 micro-batches x 1 row): loss deviation": 0.0025074165676714695,
+    "accumulated (4 micro-batches x 1 row): update deviation": 0.6310132754841614,
+    "one batch (1 x 4 rows): loss": 10.847185134887695,
+    "one batch (1 x 4 rows): loss deviation": 1.2324031480063837e-07,
+    "one batch (1 x 4 rows): update deviation": 4.4662177023100275e-07
+  },
+  "noise_floor": 4.4540923149936487e-07,
+  "declared_intent": null,
+  "limitations": [
+    "proxy model; real weights not used",
+    "single-process CPU float32; GPU, mixed precision and distributed paths not tested",
+    "noise-floor pass band (2x) and fail multiplier (10x) are provisional, not yet calibrated on the regression bank (spec Section 10.2)",
+    "update checked as the accumulated gradient handed to the optimizer (plain SGD, no clipping); optimizer maths itself not tested"
+  ],
+  "reason": null
+}

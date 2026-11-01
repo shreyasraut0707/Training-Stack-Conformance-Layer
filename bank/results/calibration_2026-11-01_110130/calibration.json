@@ -1,0 +1,478 @@
+{
+  "current": {
+    "pass_band": 2.0,
+    "fail_multiplier": 10.0
+  },
+  "summary": {
+    "correct_max": {
+      "transformers": 1.0574460196423745,
+      "trl": 3.820019953509534
+    },
+    "defect_detection": {
+      "0.001": 8388.09661994982,
+      "0.0001": 838.8560488533424,
+      "1e-05": 84.37450291433335,
+      "1e-06": 7.672566670289429
+    }
+  },
+  "correct": [
+    {
+      "model": "Qwen/Qwen2.5-0.5B-Instruct",
+      "trainer": "transformers",
+      "seed": 0,
+      "status": "pass",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 0.5630606133894739,
+        "accumulated (4 micro-batches x 1 row) / update": 0.9825377626844838,
+        "one batch (1 x 4 rows) / loss": 0.1084570371305274,
+        "one batch (1 x 4 rows) / update": 0.9904425054427934
+      }
+    },
+    {
+      "model": "Qwen/Qwen2.5-0.5B-Instruct",
+      "trainer": "transformers",
+      "seed": 1,
+      "status": "pass",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 0.04386398411493674,
+        "accumulated (4 micro-batches x 1 row) / update": 1.0175897383697217,
+        "one batch (1 x 4 rows) / loss": 0.04386398411493674,
+        "one batch (1 x 4 rows) / update": 1.0254222454935826
+      }
+    },
+    {
+      "model": "Qwen/Qwen2.5-0.5B-Instruct",
+      "trainer": "transformers",
+      "seed": 2,
+      "status": "pass",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 0.27862017698785696,
+        "accumulated (4 micro-batches x 1 row) / update": 0.998356364507803,
+        "one batch (1 x 4 rows) / loss": 0.27862017698785696,
+        "one batch (1 x 4 rows) / update": 1.0046285600916522
+      }
+    },
+    {
+      "model": "Qwen/Qwen2.5-0.5B-Instruct",
+      "trainer": "transformers",
+      "seed": 3,
+      "status": "pass",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 0.2769807419387507,
+        "accumulated (4 micro-batches x 1 row) / update": 1.0006206720666697,
+        "one batch (1 x 4 rows) / loss": 0.39159755161242743,
+        "one batch (1 x 4 rows) / update": 1.0074869008664857
+      }
+    },
+    {
+      "model": "Qwen/Qwen2.5-0.5B-Instruct",
+      "trainer": "transformers",
+      "seed": 4,
+      "status": "pass",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 0.5158551454250846,
+        "accumulated (4 micro-batches x 1 row) / update": 0.999946880067853,
+        "one batch (1 x 4 rows) / loss": 0.15445342862505312,
+        "one batch (1 x 4 rows) / update": 1.0046674827494724
+      }
+    },
+    {
+      "model": "Qwen/Qwen2.5-0.5B-Instruct",
+      "trainer": "trl",
+      "seed": 0,
+      "status": "info",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 0.5630606133894739,
+        "accumulated (4 micro-batches x 1 row) / update": 3.6761838273220113,
+        "one batch (1 x 4 rows) / loss": 0.1084570371305274,
+        "one batch (1 x 4 rows) / update": 0.9398584597076586
+      }
+    },
+    {
+      "model": "Qwen/Qwen2.5-0.5B-Instruct",
+      "trainer": "trl",
+      "seed": 1,
+      "status": "info",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 0.714092001231836,
+        "accumulated (4 micro-batches x 1 row) / update": 3.820019953509534,
+        "one batch (1 x 4 rows) / loss": 0.714092001231836,
+        "one batch (1 x 4 rows) / update": 0.9448769319036658
+      }
+    },
+    {
+      "model": "Qwen/Qwen2.5-0.5B-Instruct",
+      "trainer": "trl",
+      "seed": 2,
+      "status": "info",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 0.27862017698785696,
+        "accumulated (4 micro-batches x 1 row) / update": 2.801042613176564,
+        "one batch (1 x 4 rows) / loss": 0.27862017698785696,
+        "one batch (1 x 4 rows) / update": 1.0965830743787524
+      }
+    },
+    {
+      "model": "Qwen/Qwen2.5-0.5B-Instruct",
+      "trainer": "trl",
+      "seed": 3,
+      "status": "info",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 0.2769807419387507,
+        "accumulated (4 micro-batches x 1 row) / update": 2.804223467107458,
+        "one batch (1 x 4 rows) / loss": 0.2769807419387507,
+        "one batch (1 x 4 rows) / update": 0.8626440388790237
+      }
+    },
+    {
+      "model": "Qwen/Qwen2.5-0.5B-Instruct",
+      "trainer": "trl",
+      "seed": 4,
+      "status": "info",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 0.5158551454250846,
+        "accumulated (4 micro-batches x 1 row) / update": 2.869143926983665,
+        "one batch (1 x 4 rows) / loss": 0.15445342862505312,
+        "one batch (1 x 4 rows) / update": 1.1108071118760983
+      }
+    },
+    {
+      "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "trainer": "transformers",
+      "seed": 0,
+      "status": "pass",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 0.29738049297751296,
+        "accumulated (4 micro-batches x 1 row) / update": 0.994562987015813,
+        "one batch (1 x 4 rows) / loss": 0.29738049297751296,
+        "one batch (1 x 4 rows) / update": 1.0042851084974034
+      }
+    },
+    {
+      "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "trainer": "transformers",
+      "seed": 1,
+      "status": "pass",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 0.42222015978844335,
+        "accumulated (4 micro-batches x 1 row) / update": 0.9970030006324706,
+        "one batch (1 x 4 rows) / loss": 0.3141668354982632,
+        "one batch (1 x 4 rows) / update": 1.0077544843858044
+      }
+    },
+    {
+      "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "trainer": "transformers",
+      "seed": 2,
+      "status": "pass",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 0.4693422389961989,
+        "accumulated (4 micro-batches x 1 row) / update": 1.010526285688004,
+        "one batch (1 x 4 rows) / loss": 0.26823084743197617,
+        "one batch (1 x 4 rows) / update": 1.0188299296174061
+      }
+    },
+    {
+      "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "trainer": "transformers",
+      "seed": 3,
+      "status": "pass",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 0.3882082569560191,
+        "accumulated (4 micro-batches x 1 row) / update": 0.9679910919035102,
+        "one batch (1 x 4 rows) / loss": 0.34675752494847456,
+        "one batch (1 x 4 rows) / update": 0.9743805395233879
+      }
+    },
+    {
+      "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "trainer": "transformers",
+      "seed": 4,
+      "status": "pass",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 0.28200445239735084,
+        "accumulated (4 micro-batches x 1 row) / update": 1.0072860161492039,
+        "one batch (1 x 4 rows) / loss": 0.28200445239735084,
+        "one batch (1 x 4 rows) / update": 1.01165891742273
+      }
+    },
+    {
+      "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "trainer": "trl",
+      "seed": 0,
+      "status": "info",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 0.29738049297751296,
+        "accumulated (4 micro-batches x 1 row) / update": 2.267964113789849,
+        "one batch (1 x 4 rows) / loss": 1.1776567424848703,
+        "one batch (1 x 4 rows) / update": 1.0519516570427319
+      }
+    },
+    {
+      "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "trainer": "trl",
+      "seed": 1,
+      "status": "info",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 0.42222015978844335,
+        "accumulated (4 micro-batches x 1 row) / update": 2.4771424783054794,
+        "one batch (1 x 4 rows) / loss": 0.3141668354982632,
+        "one batch (1 x 4 rows) / update": 0.9617283363145199
+      }
+    },
+    {
+      "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "trainer": "trl",
+      "seed": 2,
+      "status": "info",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 0.4693422389961989,
+        "accumulated (4 micro-batches x 1 row) / update": 2.385966314506655,
+        "one batch (1 x 4 rows) / loss": 0.26823084743197617,
+        "one batch (1 x 4 rows) / update": 1.16577320480162
+      }
+    },
+    {
+      "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "trainer": "trl",
+      "seed": 3,
+      "status": "pass",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 0.34675752494847456,
+        "accumulated (4 micro-batches x 1 row) / update": 1.9151775978382715,
+        "one batch (1 x 4 rows) / loss": 0.34675752494847456,
+        "one batch (1 x 4 rows) / update": 1.0202660820013292
+      }
+    },
+    {
+      "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "trainer": "trl",
+      "seed": 4,
+      "status": "pass",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 0.28200445239735084,
+        "accumulated (4 micro-batches x 1 row) / update": 1.9756226030013617,
+        "one batch (1 x 4 rows) / loss": 0.28200445239735084,
+        "one batch (1 x 4 rows) / update": 0.8947703866435728
+      }
+    },
+    {
+      "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+      "trainer": "transformers",
+      "seed": 0,
+      "status": "pass",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 0.8000581127541561,
+        "accumulated (4 micro-batches x 1 row) / update": 0.993585178019736,
+        "one batch (1 x 4 rows) / loss": 0.033962250309196945,
+        "one batch (1 x 4 rows) / update": 1.0029297461697004
+      }
+    },
+    {
+      "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+      "trainer": "transformers",
+      "seed": 1,
+      "status": "pass",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 0.5854278037604189,
+        "accumulated (4 micro-batches x 1 row) / update": 1.0455152009778221,
+        "one batch (1 x 4 rows) / loss": 0.18512515330015167,
+        "one batch (1 x 4 rows) / update": 1.0574460196423745
+      }
+    },
+    {
+      "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+      "trainer": "transformers",
+      "seed": 2,
+      "status": "pass",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 0.3603232226992354,
+        "accumulated (4 micro-batches x 1 row) / update": 0.9865058903926925,
+        "one batch (1 x 4 rows) / loss": 0.41198240475057457,
+        "one batch (1 x 4 rows) / update": 0.9996987250649906
+      }
+    },
+    {
+      "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+      "trainer": "transformers",
+      "seed": 3,
+      "status": "pass",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 0.45421571338918487,
+        "accumulated (4 micro-batches x 1 row) / update": 0.9868291981024364,
+        "one batch (1 x 4 rows) / loss": 0.45421571338918487,
+        "one batch (1 x 4 rows) / update": 1.0023419226490209
+      }
+    },
+    {
+      "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+      "trainer": "transformers",
+      "seed": 4,
+      "status": "pass",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 0.11641428753801059,
+        "accumulated (4 micro-batches x 1 row) / update": 0.9978551857658136,
+        "one batch (1 x 4 rows) / loss": 0.11641428753801059,
+        "one batch (1 x 4 rows) / update": 1.010210260752823
+      }
+    },
+    {
+      "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+      "trainer": "trl",
+      "seed": 0,
+      "status": "pass",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 0.8000581127541561,
+        "accumulated (4 micro-batches x 1 row) / update": 1.955723821418201,
+        "one batch (1 x 4 rows) / loss": 0.033962250309196945,
+        "one batch (1 x 4 rows) / update": 0.9907160639248368
+      }
+    },
+    {
+      "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+      "trainer": "trl",
+      "seed": 1,
+      "status": "info",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 0.18512515330015167,
+        "accumulated (4 micro-batches x 1 row) / update": 2.187622880483505,
+        "one batch (1 x 4 rows) / loss": 0.18512515330015167,
+        "one batch (1 x 4 rows) / update": 1.0201075561554191
+      }
+    },
+    {
+      "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+      "trainer": "trl",
+      "seed": 2,
+      "status": "pass",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 0.3603232226992354,
+        "accumulated (4 micro-batches x 1 row) / update": 1.950943158991687,
+        "one batch (1 x 4 rows) / loss": 0.3603232226992354,
+        "one batch (1 x 4 rows) / update": 1.0006383043227571
+      }
+    },
+    {
+      "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+      "trainer": "trl",
+      "seed": 3,
+      "status": "pass",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 0.45421571338918487,
+        "accumulated (4 micro-batches x 1 row) / update": 1.9105770430505258,
+        "one batch (1 x 4 rows) / loss": 0.45421571338918487,
+        "one batch (1 x 4 rows) / update": 0.9917967359359512
+      }
+    },
+    {
+      "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+      "trainer": "trl",
+      "seed": 4,
+      "status": "info",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 0.11641428753801059,
+        "accumulated (4 micro-batches x 1 row) / update": 2.1539567881818864,
+        "one batch (1 x 4 rows) / loss": 0.11641428753801059,
+        "one batch (1 x 4 rows) / update": 1.0098469814956397
+      }
+    }
+  ],
+  "defects": [
+    {
+      "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "trainer": "transformers",
+      "epsilon": 0.001,
+      "status": "fail",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 8388.09661994982,
+        "accumulated (4 micro-batches x 1 row) / update": 2228.774910765222,
+        "one batch (1 x 4 rows) / loss": 8389.57165718528,
+        "one batch (1 x 4 rows) / update": 2228.774505737502
+      }
+    },
+    {
+      "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "trainer": "trl",
+      "epsilon": 0.001,
+      "status": "fail",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 8388.09661994982,
+        "accumulated (4 micro-batches x 1 row) / update": 2228.9011473840083,
+        "one batch (1 x 4 rows) / loss": 8388.09661994982,
+        "one batch (1 x 4 rows) / update": 2228.7208551105973
+      }
+    },
+    {
+      "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "trainer": "transformers",
+      "epsilon": 0.0001,
+      "status": "fail",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 838.8560488533424,
+        "accumulated (4 micro-batches x 1 row) / update": 222.9234802960284,
+        "one batch (1 x 4 rows) / loss": 839.5935674710736,
+        "one batch (1 x 4 rows) / update": 222.92775356158754
+      }
+    },
+    {
+      "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "trainer": "trl",
+      "epsilon": 0.0001,
+      "status": "fail",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 838.8560488533424,
+        "accumulated (4 micro-batches x 1 row) / update": 222.88475065776967,
+        "one batch (1 x 4 rows) / loss": 838.1185302356112,
+        "one batch (1 x 4 rows) / update": 222.86283438464622
+      }
+    },
+    {
+      "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "trainer": "transformers",
+      "epsilon": 1e-05,
+      "status": "fail",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 84.37450291433335,
+        "accumulated (4 micro-batches x 1 row) / update": 22.372087106000656,
+        "one batch (1 x 4 rows) / loss": 84.37450291433335,
+        "one batch (1 x 4 rows) / update": 22.36997989668054
+      }
+    },
+    {
+      "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "trainer": "trl",
+      "epsilon": 1e-05,
+      "status": "fail",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 84.37450291433335,
+        "accumulated (4 micro-batches x 1 row) / update": 22.5821464486657,
+        "one batch (1 x 4 rows) / loss": 82.89946567887097,
+        "one batch (1 x 4 rows) / update": 22.279461070153253
+      }
+    },
+    {
+      "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "trainer": "transformers",
+      "epsilon": 1e-06,
+      "status": "info",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 7.672566670289429,
+        "accumulated (4 micro-batches x 1 row) / update": 2.3456207938418987,
+        "one batch (1 x 4 rows) / loss": 8.410085288020621,
+        "one batch (1 x 4 rows) / update": 2.3494408891052276
+      }
+    },
+    {
+      "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "trainer": "trl",
+      "epsilon": 1e-06,
+      "status": "info",
+      "ratios": {
+        "accumulated (4 micro-batches x 1 row) / loss": 7.672566670289429,
+        "accumulated (4 micro-batches x 1 row) / update": 3.308985555915798,
+        "one batch (1 x 4 rows) / loss": 6.935048052558237,
+        "one batch (1 x 4 rows) / update": 2.3377177688938438
+      }
+    }
+  ]
+}

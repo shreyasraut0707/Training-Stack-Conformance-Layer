@@ -1,0 +1,209 @@
+{
+  "probe": "P2-loss-bearing-tokens",
+  "status": "pass",
+  "oracle": "the labels tensor of the trainer's first real batch, compared with the declared intent; prompt boundaries from the tokenizer's own chat template",
+  "environment": {
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26300-SP0",
+    "torch": "2.15.0+cpu",
+    "transformers": "5.22.1",
+    "trl": "1.17.1",
+    "peft": "0.21.2",
+    "accelerate": "1.15.0",
+    "datasets": "5.1.0",
+    "device": "cpu",
+    "dtype": "float32",
+    "seeds": {
+      "proxy": 0,
+      "trainer": 0
+    }
+  },
+  "reproducer": "python -m conform.probes.p2_loss_tokens HuggingFaceTB/SmolLM2-135M-Instruct --trainer transformers --data-format prompt_completion --seed 0 --intent single_bos=true",
+  "findings": [
+    {
+      "evidence_class": "seen",
+      "claim": "The final EOS token (id 2) carries loss in 0 of 4 rows",
+      "evidence": {
+        "rows_checked": 4,
+        "eos_supervised": 0
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "Leading BOS tokens (id 1) per row: [1, 1, 1, 1]",
+      "evidence": {
+        "leading_bos": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "128 of 140 prompt tokens carry loss (4 rows)",
+      "evidence": {
+        "prompt_tokens": 140,
+        "supervised_prompt_tokens": 128
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "12 real tokens share the pad ID 2; 12 of them carry no loss",
+      "evidence": {
+        "pad_id_real_tokens": 12,
+        "pad_id_real_tokens_masked": 12
+      },
+      "rule": null
+    }
+  ],
+  "observed": {
+    "trainer": "Transformers Trainer + DataCollatorForLanguageModeling(mlm=False)",
+    "data_format": "prompt_completion",
+    "unsupported_trainer_options": [],
+    "proxy": {
+      "model_id": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "model_type": "llama",
+      "revision": "12fd25f77366fa6b3b4b768ec3050bf629380bac",
+      "vocab_size": 49152,
+      "tokenizer_len": 49152,
+      "num_hidden_layers": 2,
+      "hidden_size": 64,
+      "seed": 0,
+      "pad_token_id": 2,
+      "eos_token_id": 2,
+      "bos_token_id": 1,
+      "pad_equals_eos": true
+    },
+    "token_ids": {
+      "bos": 1,
+      "eos": 2,
+      "pad": 2
+    },
+    "rows": [
+      {
+        "real_tokens": 44,
+        "prompt_tokens": 37,
+        "supervised_spans": [
+          [
+            1,
+            19
+          ],
+          [
+            20,
+            31
+          ],
+          [
+            32,
+            42
+          ],
+          [
+            43,
+            44
+          ]
+        ],
+        "supervised_prompt_tokens": 34,
+        "leading_bos": 1,
+        "final_eos_supervised": false,
+        "pad_id_real_tokens": 3,
+        "pad_id_real_tokens_masked": 3
+      },
+      {
+        "real_tokens": 43,
+        "prompt_tokens": 35,
+        "supervised_spans": [
+          [
+            1,
+            19
+          ],
+          [
+            20,
+            29
+          ],
+          [
+            30,
+            41
+          ],
+          [
+            42,
+            43
+          ]
+        ],
+        "supervised_prompt_tokens": 32,
+        "leading_bos": 1,
+        "final_eos_supervised": false,
+        "pad_id_real_tokens": 3,
+        "pad_id_real_tokens_masked": 3
+      },
+      {
+        "real_tokens": 44,
+        "prompt_tokens": 35,
+        "supervised_spans": [
+          [
+            1,
+            19
+          ],
+          [
+            20,
+            29
+          ],
+          [
+            30,
+            42
+          ],
+          [
+            43,
+            44
+          ]
+        ],
+        "supervised_prompt_tokens": 32,
+        "leading_bos": 1,
+        "final_eos_supervised": false,
+        "pad_id_real_tokens": 3,
+        "pad_id_real_tokens_masked": 3
+      },
+      {
+        "real_tokens": 37,
+        "prompt_tokens": 33,
+        "supervised_spans": [
+          [
+            1,
+            19
+          ],
+          [
+            20,
+            27
+          ],
+          [
+            28,
+            35
+          ],
+          [
+            36,
+            37
+          ]
+        ],
+        "supervised_prompt_tokens": 30,
+        "leading_bos": 1,
+        "final_eos_supervised": false,
+        "pad_id_real_tokens": 3,
+        "pad_id_real_tokens_masked": 3
+      }
+    ]
+  },
+  "noise_floor": null,
+  "declared_intent": {
+    "single_bos": true
+  },
+  "limitations": [
+    "proxy model; real weights not used",
+    "packing and padding-free batches not tested unless the recipe enables them (P4)",
+    "built-in sample conversations, not the user's rows",
+    "Transformers path uses the common recipe: chat-template tokenization plus DataCollatorForLanguageModeling(mlm=False); a custom collator may behave differently"
+  ],
+  "reason": null
+}

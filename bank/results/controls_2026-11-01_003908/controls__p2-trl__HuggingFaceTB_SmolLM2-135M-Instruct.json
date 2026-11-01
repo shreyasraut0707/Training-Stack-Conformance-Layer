@@ -1,0 +1,162 @@
+{
+  "probe": "P2-loss-bearing-tokens",
+  "status": "pass",
+  "oracle": "the labels tensor of the trainer's first real batch, compared with the declared intent; prompt boundaries from the tokenizer's own chat template",
+  "environment": {
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26300-SP0",
+    "torch": "2.15.0+cpu",
+    "transformers": "5.22.1",
+    "trl": "1.17.1",
+    "peft": "0.21.2",
+    "accelerate": "1.15.0",
+    "datasets": "5.1.0",
+    "device": "cpu",
+    "dtype": "float32",
+    "seeds": {
+      "proxy": 0,
+      "trainer": 0
+    }
+  },
+  "reproducer": "python -m conform.probes.p2_loss_tokens HuggingFaceTB/SmolLM2-135M-Instruct --trainer trl --data-format prompt_completion --seed 0 --intent supervise_eos=true --intent mask_prompt=true --intent single_bos=true",
+  "findings": [
+    {
+      "evidence_class": "seen",
+      "claim": "The final EOS token (id 2) carries loss in 4 of 4 rows",
+      "evidence": {
+        "rows_checked": 4,
+        "eos_supervised": 4
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "Leading BOS tokens (id 1) per row: [1, 1, 1, 1]",
+      "evidence": {
+        "leading_bos": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "0 of 140 prompt tokens carry loss (4 rows)",
+      "evidence": {
+        "prompt_tokens": 140,
+        "supervised_prompt_tokens": 0
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "12 real tokens share the pad ID 2; 8 of them carry no loss",
+      "evidence": {
+        "pad_id_real_tokens": 12,
+        "pad_id_real_tokens_masked": 8
+      },
+      "rule": null
+    }
+  ],
+  "observed": {
+    "trainer": "TRL SFTTrainer",
+    "data_format": "prompt_completion",
+    "unsupported_trainer_options": [],
+    "proxy": {
+      "model_id": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "model_type": "llama",
+      "revision": "12fd25f77366fa6b3b4b768ec3050bf629380bac",
+      "vocab_size": 49152,
+      "tokenizer_len": 49152,
+      "num_hidden_layers": 2,
+      "hidden_size": 64,
+      "seed": 0,
+      "pad_token_id": 2,
+      "eos_token_id": 2,
+      "bos_token_id": 1,
+      "pad_equals_eos": true
+    },
+    "token_ids": {
+      "bos": 1,
+      "eos": 2,
+      "pad": 2
+    },
+    "rows": [
+      {
+        "real_tokens": 44,
+        "prompt_tokens": 37,
+        "supervised_spans": [
+          [
+            37,
+            44
+          ]
+        ],
+        "supervised_prompt_tokens": 0,
+        "leading_bos": 1,
+        "final_eos_supervised": true,
+        "pad_id_real_tokens": 3,
+        "pad_id_real_tokens_masked": 2
+      },
+      {
+        "real_tokens": 43,
+        "prompt_tokens": 35,
+        "supervised_spans": [
+          [
+            35,
+            43
+          ]
+        ],
+        "supervised_prompt_tokens": 0,
+        "leading_bos": 1,
+        "final_eos_supervised": true,
+        "pad_id_real_tokens": 3,
+        "pad_id_real_tokens_masked": 2
+      },
+      {
+        "real_tokens": 44,
+        "prompt_tokens": 35,
+        "supervised_spans": [
+          [
+            35,
+            44
+          ]
+        ],
+        "supervised_prompt_tokens": 0,
+        "leading_bos": 1,
+        "final_eos_supervised": true,
+        "pad_id_real_tokens": 3,
+        "pad_id_real_tokens_masked": 2
+      },
+      {
+        "real_tokens": 37,
+        "prompt_tokens": 33,
+        "supervised_spans": [
+          [
+            33,
+            37
+          ]
+        ],
+        "supervised_prompt_tokens": 0,
+        "leading_bos": 1,
+        "final_eos_supervised": true,
+        "pad_id_real_tokens": 3,
+        "pad_id_real_tokens_masked": 2
+      }
+    ]
+  },
+  "noise_floor": null,
+  "declared_intent": {
+    "supervise_eos": true,
+    "mask_prompt": true,
+    "single_bos": true
+  },
+  "limitations": [
+    "proxy model; real weights not used",
+    "built-in sample conversations, not the user's rows (recipe input arrives in M1)",
+    "packing and padding-free batches not tested (P4)"
+  ],
+  "reason": null
+}

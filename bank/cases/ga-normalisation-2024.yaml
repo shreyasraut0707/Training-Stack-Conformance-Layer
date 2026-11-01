@@ -1,0 +1,37 @@
+id: ga-normalisation-2024
+title: Gradient-accumulation loss normalisation (Transformers Trainer)
+confidence: high
+sources:
+  - https://huggingface.co/blog/gradient_accumulation
+  - https://github.com/huggingface/transformers/pull/34191
+  - https://github.com/huggingface/transformers/pull/34198
+  - https://github.com/huggingface/transformers/releases/tag/v4.46.0
+probe: p1_grad_accum
+models:
+  - Qwen/Qwen2.5-0.5B-Instruct
+  - HuggingFaceTB/SmolLM2-135M-Instruct
+args: [--trainer, transformers]
+environments:
+  defective:
+    venv: bank-ga-defective
+    torch: "2.4.1"
+    requirements: ["transformers==4.45.2", "accelerate<1.1", "numpy<2"]
+    expect: fail
+  fixed:
+    venv: bank-p0-fixed
+    torch: "2.15.0"
+    requirements: ["transformers==5.10.1", "accelerate==1.15.0"]
+    expect: not_fail
+notes: >
+  The fix PRs were merged on 2024-10-17 and are listed in the v4.46.0 release notes;
+  4.45.2 (2024-10-07) is the last release before them. 4.46.0 and 4.46.1 were reportedly
+  yanked (not verified word for word), so the fixed pin is 4.46.3, the last 4.46 release.
+  Only the library under test is pinned exactly; the era caps keep supporting libraries
+  from that time, and part 8c records the exact resolved versions in bank/envs/.
+  The first fixed release line, 4.46 (4.46.3 tested), still counts position-0 labels
+  (case position-zero-label-count), so P1 fails it for that reason: its accumulated and
+  one-batch runs agree with each other but both differ from the reference. The fixed pin
+  is therefore 5.10.1, the first release with both fixes, shared with that case. Unlike
+  the other cases, this pair differs in more than one library (torch, transformers and
+  their dependencies), so a verdict change is not attributable to transformers alone; the
+  accumulated-vs-one-batch finding is what isolates this defect.

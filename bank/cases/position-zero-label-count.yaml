@@ -1,0 +1,34 @@
+id: position-zero-label-count
+title: Trainer counts the never-predicted position-0 label in num_items_in_batch (Transformers)
+confidence: high
+sources:
+  - https://github.com/huggingface/transformers/pull/46204
+  - https://github.com/huggingface/transformers/releases/tag/v5.10.1
+  - https://raw.githubusercontent.com/huggingface/transformers/v5.9.0/src/transformers/trainer.py
+  - https://raw.githubusercontent.com/huggingface/transformers/v5.10.1/src/transformers/trainer.py
+  - docs/m0_findings.md
+probe: p1_grad_accum
+models:
+  - Qwen/Qwen2.5-0.5B-Instruct
+  - HuggingFaceTB/SmolLM2-135M-Instruct
+args: [--trainer, transformers]
+environments:
+  defective:
+    venv: bank-p0-defective
+    torch: "2.15.0"
+    requirements: ["transformers==5.9.0", "accelerate==1.15.0"]
+    expect: fail
+  fixed:
+    venv: bank-p0-fixed
+    torch: "2.15.0"
+    requirements: ["transformers==5.10.1", "accelerate==1.15.0"]
+    expect: not_fail
+notes: >
+  Found by P1 in this project, not in the spec's list. From 4.46 (the October 2024
+  accumulation fix) to 5.9.0 the Trainer counts every label that is not -100, including
+  position 0, which a causal LM never predicts; loss and update come out scaled by
+  N / (N + rows whose first label is set). 5.10.1 counts labels[..., 1:] ("to avoid
+  over-counting position 0"). 5.10.0 is yanked on PyPI (built from an older main), so the
+  pair is the neighbouring non-yanked releases 5.9.0 and 5.10.1. The fix is PR 46204, "Fix
+  `num_items_in_batch` over-counting for causal LM losses" (merged 2026-05-27, listed in the
+  v5.10.1 release notes): a maintainer-confirmed defect, so confidence is high.

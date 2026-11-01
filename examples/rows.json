@@ -1,0 +1,6 @@
+[
+  {"prompt": "What is the capital of France?", "completion": "Paris."},
+  {"prompt": "Give me a word that rhymes with cat.", "completion": "Hat rhymes with cat."},
+  {"prompt": "Say yes.", "completion": "Yes."},
+  {"prompt": "Count to three.", "completion": "One, two, three."}
+]

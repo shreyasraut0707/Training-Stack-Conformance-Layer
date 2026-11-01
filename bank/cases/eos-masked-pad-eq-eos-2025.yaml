@@ -1,0 +1,27 @@
+id: eos-masked-pad-eq-eos-2025
+title: SFTTrainer masks EOS when PAD equals EOS (TRL)
+confidence: high
+sources:
+  - https://github.com/huggingface/trl/pull/3200
+  - https://github.com/huggingface/trl/releases/tag/v0.16.1
+probe: p2_loss_tokens
+models:
+  - HuggingFaceTB/SmolLM2-135M-Instruct   # needs a PAD = EOS tokenizer
+args: [--trainer, trl, --data-format, messages, --intent, supervise_eos=true]
+environments:
+  defective:
+    venv: bank-eos-defective
+    torch: "2.6.0"
+    requirements: ["trl==0.16.0", "transformers==4.50.3", "accelerate<1.7", "datasets<4"]
+    expect: fail
+  fixed:
+    venv: bank-eos-fixed
+    torch: "2.6.0"
+    requirements: ["trl==0.16.1", "transformers==4.50.3", "accelerate<1.7", "datasets<4"]
+    expect: not_fail
+notes: >
+  PR 3200 ("Fix SFT masking EOS when equal to PAD") was merged on 2025-04-02 and is listed
+  in the v0.16.1 release notes, so 0.16.0 is the defective pin and 0.16.1 the fixed one.
+  Transformers is held at the same version in both, so only TRL changes. transformers
+  4.50.3 is a proposal from memory; the part 8c dry run must confirm it resolves.
+  The spec also maps this case to P7, which arrives in M1.

@@ -1,0 +1,512 @@
+[
+  {
+    "mutant": "mean-of-means",
+    "probe": "P1",
+    "trainer": "transformers",
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "mean-of-means",
+    "probe": "P1",
+    "trainer": "transformers",
+    "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "mean-of-means",
+    "probe": "P1",
+    "trainer": "transformers",
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "mean-of-means",
+    "probe": "P1",
+    "trainer": "trl",
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "mean-of-means",
+    "probe": "P1",
+    "trainer": "trl",
+    "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "mean-of-means",
+    "probe": "P1",
+    "trainer": "trl",
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "position-zero-count",
+    "probe": "P1",
+    "trainer": "transformers",
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "position-zero-count",
+    "probe": "P1",
+    "trainer": "transformers",
+    "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "position-zero-count",
+    "probe": "P1",
+    "trainer": "transformers",
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "loss-scale-1e-3",
+    "probe": "P1",
+    "trainer": "transformers",
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "loss-scale-1e-3",
+    "probe": "P1",
+    "trainer": "transformers",
+    "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "loss-scale-1e-3",
+    "probe": "P1",
+    "trainer": "transformers",
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "loss-scale-1e-3",
+    "probe": "P1",
+    "trainer": "trl",
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "loss-scale-1e-3",
+    "probe": "P1",
+    "trainer": "trl",
+    "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "loss-scale-1e-3",
+    "probe": "P1",
+    "trainer": "trl",
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "loss-scale-1e-5",
+    "probe": "P1",
+    "trainer": "transformers",
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "loss-scale-1e-5",
+    "probe": "P1",
+    "trainer": "transformers",
+    "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "loss-scale-1e-5",
+    "probe": "P1",
+    "trainer": "transformers",
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "loss-scale-1e-5",
+    "probe": "P1",
+    "trainer": "trl",
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "loss-scale-1e-5",
+    "probe": "P1",
+    "trainer": "trl",
+    "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "loss-scale-1e-5",
+    "probe": "P1",
+    "trainer": "trl",
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "ignore-one-microbatch",
+    "probe": "P1",
+    "trainer": "transformers",
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "ignore-one-microbatch",
+    "probe": "P1",
+    "trainer": "transformers",
+    "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "ignore-one-microbatch",
+    "probe": "P1",
+    "trainer": "transformers",
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "ignore-one-microbatch",
+    "probe": "P1",
+    "trainer": "trl",
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "ignore-one-microbatch",
+    "probe": "P1",
+    "trainer": "trl",
+    "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "ignore-one-microbatch",
+    "probe": "P1",
+    "trainer": "trl",
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "drop-eos-labels",
+    "probe": "P2",
+    "trainer": "trl",
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "drop-eos-labels",
+    "probe": "P2",
+    "trainer": "trl",
+    "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "drop-eos-labels",
+    "probe": "P2",
+    "trainer": "trl",
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "drop-eos-labels",
+    "probe": "P7",
+    "trainer": "trl",
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "drop-eos-labels",
+    "probe": "P7",
+    "trainer": "trl",
+    "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "drop-eos-labels",
+    "probe": "P7",
+    "trainer": "trl",
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "unmask-prompt",
+    "probe": "P2",
+    "trainer": "trl",
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "unmask-prompt",
+    "probe": "P2",
+    "trainer": "trl",
+    "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "unmask-prompt",
+    "probe": "P2",
+    "trainer": "trl",
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "double-bos",
+    "probe": "P3",
+    "trainer": "trl",
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "double-bos",
+    "probe": "P3",
+    "trainer": "trl",
+    "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "double-bos",
+    "probe": "P3",
+    "trainer": "trl",
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "double-bos",
+    "probe": "P2",
+    "trainer": "trl",
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "expect": "fail",
+    "status": "pass",
+    "caught": false,
+    "reason": null
+  },
+  {
+    "mutant": "double-bos",
+    "probe": "P2",
+    "trainer": "trl",
+    "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "double-bos",
+    "probe": "P2",
+    "trainer": "trl",
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "expect": "fail",
+    "status": "pass",
+    "caught": false,
+    "reason": null
+  },
+  {
+    "mutant": "change-turn-boundary",
+    "probe": "P3",
+    "trainer": "trl",
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "change-turn-boundary",
+    "probe": "P3",
+    "trainer": "trl",
+    "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "change-turn-boundary",
+    "probe": "P3",
+    "trainer": "trl",
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "extra-trailing-eos",
+    "probe": "P3",
+    "trainer": "trl",
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "expect": "report",
+    "status": "pass",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "extra-trailing-eos",
+    "probe": "P3",
+    "trainer": "trl",
+    "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+    "expect": "report",
+    "status": "pass",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "extra-trailing-eos",
+    "probe": "P3",
+    "trainer": "trl",
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "expect": "report",
+    "status": "pass",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "wrong-generation-eos",
+    "probe": "P7",
+    "trainer": "trl",
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "wrong-generation-eos",
+    "probe": "P7",
+    "trainer": "trl",
+    "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  },
+  {
+    "mutant": "wrong-generation-eos",
+    "probe": "P7",
+    "trainer": "trl",
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "expect": "fail",
+    "status": "fail",
+    "caught": true,
+    "reason": null
+  }
+]

@@ -1,0 +1,135 @@
+{
+  "probe": "P1-grad-accum-equivalence",
+  "status": "fail",
+  "oracle": "float64 reference: summed token loss over non-ignored labels / total non-ignored tokens of the whole batch (conform.oracle)",
+  "environment": {
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26300-SP0",
+    "torch": "2.4.1",
+    "transformers": "4.45.2",
+    "trl": null,
+    "peft": null,
+    "accelerate": "1.0.1",
+    "datasets": null,
+    "device": "cpu",
+    "dtype": "float32",
+    "seeds": {
+      "proxy": 0,
+      "trainer": 0
+    }
+  },
+  "reproducer": "python -m conform.probes.p1_grad_accum Qwen/Qwen2.5-0.5B-Instruct --trainer transformers --seed 0",
+  "findings": [
+    {
+      "evidence_class": "seen",
+      "claim": "accumulated (4 micro-batches x 1 row): loss differs from the float64 reference by 0.00202 (floor 1.19e-07, pass up to 2.38e-07, fail above 1.19e-06)",
+      "evidence": {
+        "run": "accumulated (4 micro-batches x 1 row)",
+        "metric": "loss",
+        "deviation": 0.002018876768184537,
+        "floor": 1.1920928955078125e-07,
+        "verdict": "above"
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "accumulated (4 micro-batches x 1 row): update differs from the float64 reference by 0.647 (floor 4.85e-07, pass up to 9.69e-07, fail above 4.85e-06)",
+      "evidence": {
+        "run": "accumulated (4 micro-batches x 1 row)",
+        "metric": "update",
+        "deviation": 0.6467588148574185,
+        "floor": 4.845837982732562e-07,
+        "verdict": "above"
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "one batch (1 x 4 rows): loss differs from the float64 reference by 1.3e-08 (floor 1.19e-07, pass up to 2.38e-07, fail above 1.19e-06)",
+      "evidence": {
+        "run": "one batch (1 x 4 rows)",
+        "metric": "loss",
+        "deviation": 1.3033835111768022e-08,
+        "floor": 1.1920928955078125e-07,
+        "verdict": "inside"
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "one batch (1 x 4 rows): update differs from the float64 reference by 4.8e-07 (floor 4.85e-07, pass up to 9.69e-07, fail above 4.85e-06)",
+      "evidence": {
+        "run": "one batch (1 x 4 rows)",
+        "metric": "update",
+        "deviation": 4.804951382956042e-07,
+        "floor": 4.845837982732562e-07,
+        "verdict": "inside"
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "The accumulated and one-batch runs differ from each other by 0.00202 in loss and 0.647 in update",
+      "evidence": {
+        "run": "accumulated vs one batch",
+        "metric": "loss and update",
+        "loss_gap": 0.0020188898283335257,
+        "update_gap": 0.6467588085698082,
+        "verdict": "above"
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "inferred",
+      "claim": "Accumulating micro-batches does not give the same result as one large batch",
+      "evidence": {},
+      "rule": "the accumulated run is clearly away from both the reference and the one-batch run"
+    }
+  ],
+  "observed": {
+    "trainer": "Transformers Trainer",
+    "proxy": {
+      "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+      "model_type": "qwen2",
+      "revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+      "vocab_size": 151936,
+      "tokenizer_len": 151665,
+      "num_hidden_layers": 2,
+      "hidden_size": 64,
+      "seed": 0,
+      "pad_token_id": 151643,
+      "eos_token_id": 151645,
+      "bos_token_id": null,
+      "pad_equals_eos": false
+    },
+    "supervised_targets_per_row": [
+      14,
+      8,
+      4,
+      3
+    ],
+    "reference_loss": 11.913313067263463,
+    "floor_loss": 1.1920928955078125e-07,
+    "floor_update": 4.845837982732562e-07,
+    "pass_band": 2.0,
+    "multiplier": 10.0,
+    "accumulated (4 micro-batches x 1 row): loss": 11.93736457824707,
+    "accumulated (4 micro-batches x 1 row): loss deviation": 0.002018876768184537,
+    "accumulated (4 micro-batches x 1 row): update deviation": 0.6467588148574185,
+    "one batch (1 x 4 rows): loss": 11.913312911987305,
+    "one batch (1 x 4 rows): loss deviation": 1.3033835111768022e-08,
+    "one batch (1 x 4 rows): update deviation": 4.804951382956042e-07,
+    "accumulated vs one batch: loss gap": 0.0020188898283335257,
+    "accumulated vs one batch: update gap": 0.6467588085698082
+  },
+  "noise_floor": 4.845837982732562e-07,
+  "declared_intent": null,
+  "limitations": [
+    "proxy model; real weights not used",
+    "single-process CPU float32; GPU, mixed precision and distributed paths not tested",
+    "noise-floor pass band (2x) and fail multiplier (10x) are provisional, not yet calibrated on the regression bank (spec Section 10.2)",
+    "update checked as the accumulated gradient handed to the optimizer (plain SGD, no clipping); optimizer maths itself not tested"
+  ],
+  "reason": null
+}

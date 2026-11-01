@@ -1,0 +1,25 @@
+id: eos-masked-pad-eq-eos-2025-behaviour
+title: SFTTrainer masks EOS when PAD equals EOS (TRL), measured as behaviour by P7
+confidence: high
+sources:
+  - https://github.com/huggingface/trl/pull/3200
+  - https://github.com/huggingface/trl/releases/tag/v0.16.1
+probe: p7_eos_stop
+models:
+  - HuggingFaceTB/SmolLM2-135M-Instruct   # needs a PAD = EOS tokenizer
+args: [--trainer, trl, --data-format, messages]
+environments:
+  defective:
+    venv: bank-eos-defective
+    torch: "2.6.0"
+    requirements: ["trl==0.16.0", "transformers==4.50.3", "accelerate<1.7", "datasets<4"]
+    expect: fail
+  fixed:
+    venv: bank-eos-fixed
+    torch: "2.6.0"
+    requirements: ["trl==0.16.1", "transformers==4.50.3", "accelerate<1.7", "datasets<4"]
+    expect: not_fail
+notes: >
+  The same defect and environments as eos-masked-pad-eq-eos-2025, checked by the spec's
+  behavioural probe (spec Section 10.1 maps this case to P2 and P7): after a short real
+  fine-tune, saving and reloading, the defective pin should not learn to stop.

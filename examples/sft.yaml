@@ -1,0 +1,18 @@
+# Example recipe for `conform check --recipe examples/sft.yaml`.
+# The tool needs only the model or tokenizer id, the trainer settings and a few rows:
+# never the full dataset or the model's weights (a tiny proxy model is built instead).
+model: HuggingFaceTB/SmolLM2-135M-Instruct
+trainer: trl                  # trl (SFTTrainer) or transformers (Trainer + standard collator)
+data_format: prompt_completion  # or messages
+seed: 0
+# What you expect the stack to do; P2 fails only against these.
+intent:
+  supervise_eos: true
+  mask_prompt: true
+  single_bos: true
+# Trainer settings from your training script (SFTConfig / TrainingArguments fields).
+trainer_args: {}
+# A few of your own rows (or `rows_file: my_rows.json`).
+rows_file: rows.json
+# probes: [P1, P2, P3, P6, P7]   # default: every available probe
+# timeout: 900                   # seconds per probe

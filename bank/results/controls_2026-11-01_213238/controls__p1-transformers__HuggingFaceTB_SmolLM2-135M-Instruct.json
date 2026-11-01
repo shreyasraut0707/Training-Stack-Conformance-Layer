@@ -1,0 +1,129 @@
+{
+  "probe": "P1-grad-accum-equivalence",
+  "status": "pass",
+  "oracle": "float64 reference: summed token loss over non-ignored labels / total non-ignored tokens of the whole batch (conform.oracle)",
+  "environment": {
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26300-SP0",
+    "torch": "2.15.0+cpu",
+    "transformers": "5.22.1",
+    "trl": "1.17.1",
+    "peft": "0.21.2",
+    "accelerate": "1.15.0",
+    "datasets": "5.1.0",
+    "device": "cpu",
+    "dtype": "float32",
+    "seeds": {
+      "proxy": 0,
+      "trainer": 0
+    }
+  },
+  "reproducer": "python -m conform.probes.p1_grad_accum HuggingFaceTB/SmolLM2-135M-Instruct --trainer transformers --seed 0",
+  "findings": [
+    {
+      "evidence_class": "seen",
+      "claim": "accumulated (4 micro-batches x 1 row): loss differs from the float64 reference by 3.55e-08 (floor 1.19e-07, pass up to 2.38e-07, fail above 1.19e-06)",
+      "evidence": {
+        "run": "accumulated (4 micro-batches x 1 row)",
+        "metric": "loss",
+        "deviation": 3.545051729411041e-08,
+        "floor": 1.1920928955078125e-07,
+        "verdict": "inside"
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "accumulated (4 micro-batches x 1 row): update differs from the float64 reference by 4.46e-07 (floor 4.49e-07, pass up to 8.97e-07, fail above 4.49e-06)",
+      "evidence": {
+        "run": "accumulated (4 micro-batches x 1 row)",
+        "metric": "update",
+        "deviation": 4.462684559411593e-07,
+        "floor": 4.487080876397664e-07,
+        "verdict": "inside"
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "one batch (1 x 4 rows): loss differs from the float64 reference by 3.55e-08 (floor 1.19e-07, pass up to 2.38e-07, fail above 1.19e-06)",
+      "evidence": {
+        "run": "one batch (1 x 4 rows)",
+        "metric": "loss",
+        "deviation": 3.545051729411041e-08,
+        "floor": 1.1920928955078125e-07,
+        "verdict": "inside"
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "one batch (1 x 4 rows): update differs from the float64 reference by 4.51e-07 (floor 4.49e-07, pass up to 8.97e-07, fail above 4.49e-06)",
+      "evidence": {
+        "run": "one batch (1 x 4 rows)",
+        "metric": "update",
+        "deviation": 4.506308504789652e-07,
+        "floor": 4.487080876397664e-07,
+        "verdict": "inside"
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "The accumulated and one-batch runs differ from each other by 0 in loss and 9.98e-08 in update",
+      "evidence": {
+        "run": "accumulated vs one batch",
+        "metric": "loss and update",
+        "loss_gap": 0.0,
+        "update_gap": 9.975759815468223e-08,
+        "verdict": "inside"
+      },
+      "rule": null
+    }
+  ],
+  "observed": {
+    "trainer": "Transformers Trainer",
+    "proxy": {
+      "model_id": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "model_type": "llama",
+      "revision": "12fd25f77366fa6b3b4b768ec3050bf629380bac",
+      "vocab_size": 49152,
+      "tokenizer_len": 49152,
+      "num_hidden_layers": 2,
+      "hidden_size": 64,
+      "seed": 0,
+      "pad_token_id": 2,
+      "eos_token_id": 2,
+      "bos_token_id": 1,
+      "pad_equals_eos": true
+    },
+    "supervised_targets_per_row": [
+      14,
+      8,
+      4,
+      3
+    ],
+    "reference_loss": 10.847183796675102,
+    "floor_loss": 1.1920928955078125e-07,
+    "floor_update": 4.487080876397664e-07,
+    "pass_band": 2.0,
+    "multiplier": 10.0,
+    "accumulated (4 micro-batches x 1 row): loss": 10.847184181213379,
+    "accumulated (4 micro-batches x 1 row): loss deviation": 3.545051729411041e-08,
+    "accumulated (4 micro-batches x 1 row): update deviation": 4.462684559411593e-07,
+    "one batch (1 x 4 rows): loss": 10.847184181213379,
+    "one batch (1 x 4 rows): loss deviation": 3.545051729411041e-08,
+    "one batch (1 x 4 rows): update deviation": 4.506308504789652e-07,
+    "accumulated vs one batch: loss gap": 0.0,
+    "accumulated vs one batch: update gap": 9.975759815468223e-08
+  },
+  "noise_floor": 4.487080876397664e-07,
+  "declared_intent": null,
+  "limitations": [
+    "proxy model; real weights not used",
+    "single-process CPU float32; GPU, mixed precision and distributed paths not tested",
+    "noise-floor fail multiplier (10x) calibrated on injected defects and held-out historical cases; pass band (2x) kept by decision, so TRL's unmodelled kernel rounding reads as unknown (docs/calibration.md)",
+    "update checked as the accumulated gradient handed to the optimizer (plain SGD, no clipping); optimizer maths itself not tested"
+  ],
+  "reason": null
+}

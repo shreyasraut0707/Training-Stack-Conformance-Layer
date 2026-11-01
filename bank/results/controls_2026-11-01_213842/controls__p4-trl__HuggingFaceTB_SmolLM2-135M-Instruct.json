@@ -1,0 +1,76 @@
+{
+  "probe": "P4-packing-isolation",
+  "status": "pass",
+  "oracle": "metamorphic: editing document A in a packed sequence must not change document B's per-token loss",
+  "environment": {
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26300-SP0",
+    "torch": "2.15.0+cpu",
+    "transformers": "5.22.1",
+    "trl": "1.17.1",
+    "peft": "0.21.2",
+    "accelerate": "1.15.0",
+    "datasets": "5.1.0",
+    "device": "cpu",
+    "dtype": "float32",
+    "seeds": {
+      "proxy": 0,
+      "trainer": 0
+    }
+  },
+  "reproducer": "python -m conform.probes.p4_packing HuggingFaceTB/SmolLM2-135M-Instruct --trainer trl --data-format prompt_completion --seed 0",
+  "findings": [
+    {
+      "evidence_class": "seen",
+      "claim": "Editing document A changed document B's per-token loss by 0 (floor 1.19e-07; 4 documents packed, attention kernel 'eager')",
+      "evidence": {
+        "metric": "document_b_loss",
+        "deviation": 0.0,
+        "floor": 1.1920928955078125e-07,
+        "verdict": "inside",
+        "kernel": "eager"
+      },
+      "rule": null
+    }
+  ],
+  "observed": {
+    "trainer": "TRL SFTTrainer",
+    "proxy": {
+      "model_id": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "model_type": "llama",
+      "revision": "12fd25f77366fa6b3b4b768ec3050bf629380bac",
+      "vocab_size": 49152,
+      "tokenizer_len": 49152,
+      "num_hidden_layers": 2,
+      "hidden_size": 64,
+      "seed": 0,
+      "pad_token_id": 2,
+      "eos_token_id": 2,
+      "bos_token_id": 1,
+      "pad_equals_eos": true
+    },
+    "kernel": "eager",
+    "documents": 4,
+    "doc_a": [
+      0,
+      44
+    ],
+    "doc_b": [
+      44,
+      88
+    ],
+    "b_tokens": 9,
+    "gap": 0.0,
+    "floor": 1.1920928955078125e-07,
+    "verdict": "inside"
+  },
+  "noise_floor": null,
+  "declared_intent": null,
+  "limitations": [
+    "proxy model; real weights not used",
+    "CPU only: flash-attention varlen kernels are GPU-only, so isolation is checked on the kernel in use",
+    "packing as the trainer does it for this recipe (default: TRL packing, max_length 512)",
+    "fragile: the attention kernel's name is read from a private attribute (config._attn_implementation) through an adapter"
+  ],
+  "reason": null
+}

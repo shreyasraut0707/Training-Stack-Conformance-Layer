@@ -1,0 +1,96 @@
+{
+  "probe": "P5-resume-equivalence",
+  "status": "pass",
+  "oracle": "the uninterrupted run, in deterministic CPU float32",
+  "environment": {
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26300-SP0",
+    "torch": "2.15.0+cpu",
+    "transformers": "5.22.1",
+    "trl": "1.17.1",
+    "peft": "0.21.2",
+    "accelerate": "1.15.0",
+    "datasets": "5.1.0",
+    "device": "cpu",
+    "dtype": "float32",
+    "seeds": {
+      "proxy": 0,
+      "trainer": 0
+    }
+  },
+  "reproducer": "python -m conform.probes.p5_resume TinyLlama/TinyLlama-1.1B-Chat-v1.0 --trainer transformers --data-format prompt_completion --seed 0",
+  "findings": [
+    {
+      "evidence_class": "seen",
+      "claim": "Final parameters of the resumed run differ from the uninterrupted run by 0 (floor 1.19e-07, measured between two uninterrupted runs)",
+      "evidence": {
+        "metric": "parameters",
+        "deviation": 0.0,
+        "floor": 1.1920928955078125e-07,
+        "verdict": "inside"
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "Learning rate after the resume matches the uninterrupted run (steps 4-6)",
+      "evidence": {
+        "metric": "learning_rate",
+        "uninterrupted": {
+          "4": 0.0005,
+          "5": 0.00025,
+          "6": 0.0
+        },
+        "resumed": {
+          "4": 0.0005,
+          "5": 0.00025,
+          "6": 0.0
+        },
+        "verdict": "inside"
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "Rows were seen in the same order in the resumed run",
+      "evidence": {
+        "metric": "data_order",
+        "same": true,
+        "micro_batches": 7,
+        "verdict": "inside"
+      },
+      "rule": null
+    }
+  ],
+  "observed": {
+    "trainer": "Transformers Trainer + DataCollatorForLanguageModeling(mlm=False)",
+    "proxy": {
+      "model_id": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+      "model_type": "llama",
+      "revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+      "vocab_size": 32000,
+      "tokenizer_len": 32000,
+      "num_hidden_layers": 2,
+      "hidden_size": 64,
+      "seed": 0,
+      "pad_token_id": 2,
+      "eos_token_id": 2,
+      "bos_token_id": 1,
+      "pad_equals_eos": true
+    },
+    "steps": 6,
+    "stop_at": 3,
+    "param_gap": 0.0,
+    "floor": 1.1920928955078125e-07,
+    "lr_same": true,
+    "order_same": true
+  },
+  "noise_floor": 1.1920928955078125e-07,
+  "declared_intent": null,
+  "limitations": [
+    "proxy model; real weights not used",
+    "6 steps, checkpoint after step 3, batch size 1, single process on CPU",
+    "multi-process and GPU resume paths not tested"
+  ],
+  "reason": null
+}

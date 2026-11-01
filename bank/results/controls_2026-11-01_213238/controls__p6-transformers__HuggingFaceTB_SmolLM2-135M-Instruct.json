@@ -1,0 +1,139 @@
+{
+  "probe": "P6-precision",
+  "status": "info",
+  "oracle": "observation only: dtypes seen during and after one real training step",
+  "environment": {
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26300-SP0",
+    "torch": "2.15.0+cpu",
+    "transformers": "5.22.1",
+    "trl": "1.17.1",
+    "peft": "0.21.2",
+    "accelerate": "1.15.0",
+    "datasets": "5.1.0",
+    "device": "cpu",
+    "dtype": "library default",
+    "seeds": {
+      "proxy": 0,
+      "trainer": 0
+    }
+  },
+  "reproducer": "python -m conform.probes.p6_precision HuggingFaceTB/SmolLM2-135M-Instruct --trainer transformers --data-format prompt_completion --seed 0",
+  "findings": [
+    {
+      "evidence_class": "seen",
+      "claim": "Precision settings: bf16=False (library default), fp16=False (library default), tf32=None (library default)",
+      "evidence": {
+        "settings": {
+          "bf16": {
+            "value": false,
+            "source": "library default"
+          },
+          "fp16": {
+            "value": false,
+            "source": "library default"
+          },
+          "tf32": {
+            "value": null,
+            "source": "library default"
+          }
+        }
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "Parameters after one step are float32",
+      "evidence": {
+        "parameters": [
+          "float32"
+        ]
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "Linear layers computed in float32",
+      "evidence": {
+        "compute": [
+          "float32"
+        ]
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "Gradients are float32",
+      "evidence": {
+        "gradients": [
+          "float32"
+        ]
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "Optimizer AdamW keeps its state in float32",
+      "evidence": {
+        "optimizer": "AdamW",
+        "optimizer_state": [
+          "float32"
+        ]
+      },
+      "rule": null
+    }
+  ],
+  "observed": {
+    "trainer": "Transformers Trainer + DataCollatorForLanguageModeling(mlm=False)",
+    "proxy": {
+      "model_id": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "model_type": "llama",
+      "revision": "12fd25f77366fa6b3b4b768ec3050bf629380bac",
+      "vocab_size": 49152,
+      "tokenizer_len": 49152,
+      "num_hidden_layers": 2,
+      "hidden_size": 64,
+      "seed": 0,
+      "pad_token_id": 2,
+      "eos_token_id": 2,
+      "bos_token_id": 1,
+      "pad_equals_eos": true
+    },
+    "settings": {
+      "bf16": {
+        "value": false,
+        "source": "library default"
+      },
+      "fp16": {
+        "value": false,
+        "source": "library default"
+      },
+      "tf32": {
+        "value": null,
+        "source": "library default"
+      }
+    },
+    "parameters": [
+      "float32"
+    ],
+    "compute": [
+      "float32"
+    ],
+    "gradients": [
+      "float32"
+    ],
+    "optimizer": "AdamW",
+    "optimizer_state": [
+      "float32"
+    ],
+    "unsupported_trainer_options": []
+  },
+  "noise_floor": null,
+  "declared_intent": null,
+  "limitations": [
+    "proxy model built in float32 and passed as an object, so a trainer's own model-loading dtype default (when given a model name) is not observed",
+    "CPU only; GPU kernels and their precision behaviour are not tested",
+    "observation only: P6 never fails"
+  ],
+  "reason": null
+}

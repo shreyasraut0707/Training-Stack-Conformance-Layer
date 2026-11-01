@@ -1,0 +1,154 @@
+{
+  "probe": "P2-loss-bearing-tokens",
+  "status": "pass",
+  "oracle": "the labels tensor of the trainer's first real batch, compared with the declared intent; prompt boundaries from the tokenizer's own chat template",
+  "environment": {
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26300-SP0",
+    "torch": "2.15.0+cpu",
+    "transformers": "5.22.1",
+    "trl": "1.17.1",
+    "peft": "0.21.2",
+    "accelerate": "1.15.0",
+    "datasets": "5.1.0",
+    "device": "cpu",
+    "dtype": "float32",
+    "seeds": {
+      "proxy": 0,
+      "trainer": 0
+    }
+  },
+  "reproducer": "python -m conform.probes.p2_loss_tokens Qwen/Qwen2.5-0.5B-Instruct --trainer transformers --data-format prompt_completion --seed 0 --intent single_bos=true",
+  "findings": [
+    {
+      "evidence_class": "seen",
+      "claim": "The final EOS token (id 151645) carries loss in 4 of 4 rows",
+      "evidence": {
+        "rows_checked": 4,
+        "eos_supervised": 4
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "The tokenizer defines no BOS token",
+      "evidence": {},
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "131 of 135 prompt tokens carry loss (4 rows)",
+      "evidence": {
+        "prompt_tokens": 135,
+        "supervised_prompt_tokens": 131
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "No real token shares the pad ID 151643",
+      "evidence": {
+        "pad_id_real_tokens": 0,
+        "pad_id_real_tokens_masked": 0
+      },
+      "rule": null
+    }
+  ],
+  "observed": {
+    "trainer": "Transformers Trainer + DataCollatorForLanguageModeling(mlm=False)",
+    "data_format": "prompt_completion",
+    "unsupported_trainer_options": [],
+    "proxy": {
+      "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+      "model_type": "qwen2",
+      "revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+      "vocab_size": 151936,
+      "tokenizer_len": 151665,
+      "num_hidden_layers": 2,
+      "hidden_size": 64,
+      "seed": 0,
+      "pad_token_id": 151643,
+      "eos_token_id": 151645,
+      "bos_token_id": null,
+      "pad_equals_eos": false
+    },
+    "token_ids": {
+      "bos": null,
+      "eos": 151645,
+      "pad": 151643
+    },
+    "rows": [
+      {
+        "real_tokens": 43,
+        "prompt_tokens": 36,
+        "supervised_spans": [
+          [
+            1,
+            43
+          ]
+        ],
+        "supervised_prompt_tokens": 35,
+        "leading_bos": null,
+        "final_eos_supervised": true,
+        "pad_id_real_tokens": 0,
+        "pad_id_real_tokens_masked": 0
+      },
+      {
+        "real_tokens": 42,
+        "prompt_tokens": 34,
+        "supervised_spans": [
+          [
+            1,
+            42
+          ]
+        ],
+        "supervised_prompt_tokens": 33,
+        "leading_bos": null,
+        "final_eos_supervised": true,
+        "pad_id_real_tokens": 0,
+        "pad_id_real_tokens_masked": 0
+      },
+      {
+        "real_tokens": 42,
+        "prompt_tokens": 33,
+        "supervised_spans": [
+          [
+            1,
+            42
+          ]
+        ],
+        "supervised_prompt_tokens": 32,
+        "leading_bos": null,
+        "final_eos_supervised": true,
+        "pad_id_real_tokens": 0,
+        "pad_id_real_tokens_masked": 0
+      },
+      {
+        "real_tokens": 36,
+        "prompt_tokens": 32,
+        "supervised_spans": [
+          [
+            1,
+            36
+          ]
+        ],
+        "supervised_prompt_tokens": 31,
+        "leading_bos": null,
+        "final_eos_supervised": true,
+        "pad_id_real_tokens": 0,
+        "pad_id_real_tokens_masked": 0
+      }
+    ]
+  },
+  "noise_floor": null,
+  "declared_intent": {
+    "single_bos": true
+  },
+  "limitations": [
+    "proxy model; real weights not used",
+    "built-in sample conversations, not the user's rows (recipe input arrives in M1)",
+    "packing and padding-free batches not tested (P4)",
+    "Transformers path uses the common recipe: chat-template tokenization plus DataCollatorForLanguageModeling(mlm=False); a custom collator may behave differently"
+  ],
+  "reason": null
+}
