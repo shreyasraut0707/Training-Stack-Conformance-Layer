@@ -286,3 +286,37 @@ runs counts against G4 is the owner's decision (`docs/PROGRESS.md`, open decisio
 
 **Gate status unchanged.** G4: 10 repeats identical on this computer; the second-machine
 spot check **has not been done** (one computer only). M4's stability threshold: the same.
+
+## 2026-11-01 · First GitHub CI run (cloud virtual machines, not a second computer)
+
+**Run (seen).** `ci` run 41326929545 on the private repository, commit `e51c4a3`: all jobs
+**success**. `tests (pinned)` 8 min 43 s, `tests (latest)` 11 min 5 s (both Ubuntu,
+`Linux-7.0.0-1017-azure-x86_64`, Python 3.11.17), `bank` 9 min 56 s (Windows). The
+`latest` job resolved to the same versions as the pinned stack (transformers 5.22.1,
+trl 1.17.1, torch 2.15.0+cpu), so it is not yet evidence about newer releases. Artifacts
+compared on this computer with `scripts/compare_results.py`.
+
+| Job | Runs | Fails | Verdicts vs this computer |
+|---|---|---|---|
+| tests (pinned): pytest | 122 tests (MCP test skipped: no `mcp` in the pinned stack) | 0 | — |
+| tests (pinned): G3 controls | 36 | **0** | 35 of 36 identical; `p1-trl` TinyLlama pass → info |
+| tests (latest): G3 controls | 36 | **0** | 35 of 36 identical; the same run |
+| bank (Windows) | 12 | 0 unexpected | **12 of 12 identical** (6 defective pins fail, 6 fixed pins do not) |
+
+Baselines: controls `controls_2026-11-01_104321/` plus `controls_2026-11-01_171529/repeat-01/`;
+bank `2026-11-01_104918/` plus `2026-11-01_111720/`.
+
+**The predicted borderline run moved (seen).** Largest P1 deviation as a multiple of its
+floor: `p1-trl` SmolLM2 2.27× here → 2.92× on CI (info both); Qwen2.5 3.68× → 3.32× (info
+both); TinyLlama **1.96× → 3.55×** (pass → info). Transformers' P1 and P1M stayed between
+0.98× and 1.05× (pass). No run came near the 10× fail line. This is the change recorded in
+the section above **before** any other computer was used, and it is the TRL kernel rounding
+described there.
+
+**What this is and is not.** GitHub's runners are cloud virtual machines with a different
+operating system and CPU. They show the verdicts that matter (detections, zero fails at fixed
+pins, zero fails in controls) hold off this computer. They are **not** the physical second
+computer the owner set as G4's requirement, so G4 and M4's stability threshold stay
+**pending**. If a pass ↔ info change on the three borderline `p1-trl` runs were counted
+against G4, this comparison would not meet "identical verdicts"; that decision is the
+owner's (`docs/PROGRESS.md`, open decision 5).

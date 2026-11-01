@@ -31,8 +31,13 @@ them); cases B and C differ only in the library under test. See `docs/m0_go_no_g
 | v0.1 + v0.2 in a fresh environment built from `conform.lock` (same computer) | 36 | **0**; verdicts and numbers identical to the primary runs | `controls_2026-11-01_212348/`, `_212926/` |
 | v0.1 + v0.2 on one CPU thread (same computer) | 36 | **0**; 35 of 36 verdicts identical; `p1-trl` on SmolLM2 info → pass | `controls_2026-11-01_213238/`, `_213842/` |
 
-The last two rows are extra evidence from the same computer, **not** the second-computer
-spot check (still pending). They show that the thread count moves P1-on-TRL's numbers
+| v0.1 + v0.2 on GitHub CI (Ubuntu VM, pinned stack; and again with the latest releases) | 36 + 36 | **0**; 35 of 36 verdicts identical to this computer; `p1-trl` on TinyLlama pass → info | CI run 41326929545 (artifacts) |
+
+The bank itself also ran on GitHub's Windows runner: **12 of 12 verdicts identical** to this
+computer (CI run 41326929545).
+
+The last three rows are extra evidence from the same computer or from cloud virtual
+machines, **not** the second-computer spot check (still pending). They show that the thread count moves P1-on-TRL's numbers
 across the 2× pass band for some models, never near the 10× fail line (details in
 `docs/m0_findings.md`, "Extra single-computer evidence for G4").
 

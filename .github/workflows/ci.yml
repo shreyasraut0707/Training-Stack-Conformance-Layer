@@ -1,6 +1,7 @@
 # CPU-only CI (spec Section 12.3): tests and the G3 controls on every change, across the
 # pinned stack and the latest releases; the regression bank on Windows (the bank's pinned
-# PyPI PyTorch builds are CPU-only there); a weekly run against upstream main.
+# PyPI PyTorch builds are CPU-only there), also weekly. The weekly run against upstream
+# main is its own workflow: upstream.yml.
 name: ci
 
 on:
@@ -8,7 +9,7 @@ on:
   pull_request:
   workflow_dispatch:
   schedule:
-    - cron: "0 6 * * 1"   # Mondays 06:00 UTC: the weekly upstream run
+    - cron: "0 6 * * 1"   # Mondays 06:00 UTC: the weekly bank run
 
 permissions:
   contents: read
@@ -83,27 +84,4 @@ jobs:
         if: always()
         with:
           name: bank-results
-          path: bank/results/
-
-  upstream:
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-    timeout-minutes: 90
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - name: Install upstream main of Transformers and TRL
-        run: |
-          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
-          python -m pip install -e ".[stack,dev]"
-          python -m pip install --upgrade "git+https://github.com/huggingface/transformers" "git+https://github.com/huggingface/trl"
-          python scripts/download_targets.py
-      - name: Controls on upstream main (a changed verdict needs triage, spec Figure 14)
-        run: python scripts/run_controls.py --python "$(which python)"
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: upstream-results
           path: bank/results/

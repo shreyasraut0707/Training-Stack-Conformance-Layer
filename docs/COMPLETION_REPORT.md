@@ -7,16 +7,18 @@ Date: 2026-11-01 · Version: 0.2.0.dev0 · Source of truth:
 
 **The project is not yet complete by the spec's acceptance criteria.** Everything that can
 be built and verified on this computer is done and tested (123 tests pass). Three
-acceptance checks remain, and each needs something only you can provide: a second Windows
-computer (M0's G4 and M4's stability threshold) and the Claude Code and Codex agents (M3).
+acceptance checks remain open. The **second-computer spot check** (M0's G4 and M4's
+stability threshold) is **pending**: the owner has only one computer, and it has not been
+replaced by a virtual machine, by CI or by more runs on this computer. The **runs inside
+Claude Code and Codex** (M3) need the owner at the keyboard.
 
 | Milestone | Status |
 |---|---|
-| M0 Spike | Not complete: conditional go. G1, G2, G3 met; G4 met on this computer; the second-machine spot check is missing |
+| M0 Spike | Not complete: conditional go. G1, G2, G3 met; G4 met on this computer, with extra same-computer evidence; the second-computer spot check is pending (one computer only) |
 | M1 v0.1 | **Complete** (0.1.0) |
-| M2 Bank | **Complete**: results published with misses; CI written but not yet run on GitHub |
+| M2 Bank | **Complete**: results published with misses; CI now runs on GitHub (private repository; first run in `docs/PROGRESS.md`) |
 | M3 Agents | Not complete: everything built; clean install and MCP `diagnose` verified; the run inside the two agents is missing |
-| M4 v0.2 | Not complete: P4, P5, P1M built; stability and controls met on this computer (120 of 120); second-machine check missing |
+| M4 v0.2 | Not complete: P4, P5, P1M built; stability and controls met on this computer (120 of 120, plus a fresh environment and one CPU thread); second-computer check pending |
 
 ## What was built
 
@@ -53,6 +55,12 @@ CI and release workflows; hash-pinned lockfiles; security notice.
 - **No false alarms on current releases:** 0 fails in every control run (24 v0.1 controls;
   120 M0 runs; 120 M4 runs), three tokenizer families.
 - **Stable:** identical verdicts in every one of 10 repeats (220 + 120 runs), numeric spread 0.
+- **Reproducible from the lockfile (same computer):** a fresh environment built only from
+  `bank/envs/conform.lock` gave the same verdicts and the same numbers in all 36 control
+  runs. With one CPU thread, 35 of 36 verdicts were the same; `p1-trl` on SmolLM2 moved
+  from unknown to pass. Three P1-on-TRL runs sit near the 2× pass band (none near the 10×
+  fail line), so a second computer may report them differently; this was recorded before
+  any such check (`docs/m0_findings.md`).
 - **Injected defects:** 49 of 49 applicable caught (a first run's 2 misses were a fault in
   the injected defect, published in `docs/bank_results.md`).
 - **Notable facts about current libraries:** TRL turns bf16 mixed precision on by default;
@@ -78,14 +86,27 @@ bank runner, setup and the comparison tool.
 - The bank evidence shows the probes behave as specified for the listed cases and versions;
   it does not prove the tool finds unknown bugs or that these defects matter to most users.
 
+## Repository and publishing
+
+- GitHub: **private** repository `shreyasraut0707/Training-Stack-Conformance-Layer`
+  (created 2026-11-01), branch `main`; the spec PDF is not in it.
+- PyPI: **nothing published.** The package builds and passes `twine check --strict`; the
+  release workflow publishes with Trusted Publishing and attestations, with a TestPyPI
+  rehearsal. Blocked on the final name (`conform` is taken) and on your accounts and
+  approval (`docs/publishing_steps.md`, section 3).
+
 ## What you need to do personally
 
-1. **Second-machine spot check** (closes M0's G4 and M4): `docs/g4_second_machine_steps.md`.
-2. **Agent check in Claude Code and Codex** (closes M3): `docs/m3_agent_check_steps.md`.
-3. **GitHub repository** (first real CI run): `docs/publishing_steps.md`, section 2.
-4. **Final name and publishing** (`conform` is taken on PyPI): `docs/publishing_steps.md`.
-5. **Decisions:** contacting maintainers before public claims; the first public artifact;
-   keeping or deleting the unused `bank-ga-fixed` environment (1.4 GB).
+1. **Agent check in Claude Code and Codex** (closes M3): `docs/m3_agent_check_steps.md`.
+2. **Final name, PyPI and TestPyPI accounts, publishing** (only when you approve):
+   `docs/publishing_steps.md`.
+3. **Second-computer spot check** (closes M0's G4 and M4): pending while you have one
+   computer; if you ever borrow another Windows computer for about two hours:
+   `docs/g4_second_machine_steps.md`.
+4. **Decisions:** contacting maintainers before public claims; the first public artifact;
+   when the repository becomes public; how to count a pass ↔ unknown change on the three
+   borderline P1-on-TRL runs at a second-computer check; keeping or deleting the unused
+   `bank-ga-fixed` environment (1.4 GB).
 
-When you bring back the second-machine results or the agent outcomes, they are compared and
+When you bring back the agent outcomes or second-computer results, they are compared and
 recorded, and the milestones are marked complete only if they pass.

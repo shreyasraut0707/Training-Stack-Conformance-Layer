@@ -21,18 +21,19 @@ reports). `bank/results/` is included on purpose: it is the evidence behind
 `docs/bank_results.md`. Status of the repository and of the first CI run:
 `docs/PROGRESS.md`.
 
-**What CI runs** (`.github/workflows/ci.yml`): on every push, the tests and the G3 controls
+**What CI runs.** `.github/workflows/ci.yml`: on every push, the tests and the G3 controls
 on the pinned stack (must pass) and on the latest releases (informational), and the
-regression bank on Windows; every Monday and on "Run workflow", a check against upstream
-`main` of Transformers and TRL. **Pass if:** the `tests (pinned)` job is green and the
-`bank` job's summary shows every row `match`.
+regression bank on Windows (also every Monday). `.github/workflows/upstream.yml`: every
+Monday, and whenever you press "Run workflow", the controls against upstream `main` of
+Transformers and TRL. **Pass if:** the `tests (pinned)` job is green and the `bank` job's
+summary shows every row `match`.
 
 **Cost of a private repository.** On GitHub's Free plan, Actions runs in private
 repositories draw on an included monthly amount (about USD 12 of runner time; Windows
 minutes cost more than Linux minutes). When it is used up, runs stop; nothing is charged
-unless you add a payment method and a budget. One full CI run takes roughly an hour of
-Linux time plus up to two hours of Windows time, so expect on the order of ten full runs
-a month. To limit waste, a newer push cancels an older run of the same branch and every
+unless you add a payment method and a budget. The first full CI run (2026-11-01) used
+about 20 minutes of Linux time and 10 minutes of Windows time, roughly USD 0.20, so the
+allowance covers dozens of runs a month. To limit waste, a newer push cancels an older run of the same branch and every
 job has a time limit. Public repositories do not use this allowance.
 
 To view runs: the repository's **Actions** tab, or in a terminal:

@@ -1,0 +1,43 @@
+# The weekly run against upstream main of Transformers and TRL (spec Section 11.1, M2). Its
+# own workflow so it can also be started alone ("Run workflow") without the full CI run. A
+# changed verdict here needs triage (spec Figure 14): an upstream change, a probe that needs
+# updating, or a new defect.
+name: upstream
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"   # Mondays 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: upstream-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+
+jobs:
+  upstream:
+    timeout-minutes: 90
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install upstream main of Transformers and TRL
+        run: |
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -e ".[stack,dev]"
+          python -m pip install --upgrade "git+https://github.com/huggingface/transformers" "git+https://github.com/huggingface/trl"
+          python scripts/download_targets.py
+      - name: Controls on upstream main (a changed verdict needs triage, spec Figure 14)
+        run: python scripts/run_controls.py --python "$(which python)"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: upstream-results
+          path: bank/results/
