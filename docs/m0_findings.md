@@ -320,3 +320,9 @@ computer the owner set as G4's requirement, so G4 and M4's stability threshold s
 **pending**. If a pass ↔ info change on the three borderline `p1-trl` runs were counted
 against G4, this comparison would not meet "identical verdicts"; that decision is the
 owner's (`docs/PROGRESS.md`, open decision 5).
+
+**First run against upstream main (seen).** `upstream` run 41328069985 (its own workflow,
+started by hand, commit `581d4a0`): **success**, 6 min 32 s, transformers 5.23.0.dev0 and
+trl 1.18.0.dev0 from `main`. 36 control runs, **0 fails**; verdicts identical to the CI runs
+on the current releases (35 of 36 identical to this computer, the same borderline `p1-trl`
+TinyLlama run). No upstream change needs triage today.

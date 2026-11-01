@@ -16,7 +16,7 @@ Claude Code and Codex** (M3) need the owner at the keyboard.
 |---|---|
 | M0 Spike | Not complete: conditional go. G1, G2, G3 met; G4 met on this computer, with extra same-computer evidence; the second-computer spot check is pending (one computer only) |
 | M1 v0.1 | **Complete** (0.1.0) |
-| M2 Bank | **Complete**: results published with misses; CI now runs on GitHub (private repository; first run in `docs/PROGRESS.md`) |
+| M2 Bank | **Complete**: results published with misses; the CI matrix ran on GitHub with every job green (runs 41326929545 and 41328058562), and the weekly upstream run works (41328069985) |
 | M3 Agents | Not complete: everything built; clean install and MCP `diagnose` verified; the run inside the two agents is missing |
 | M4 v0.2 | Not complete: P4, P5, P1M built; stability and controls met on this computer (120 of 120, plus a fresh environment and one CPU thread); second-computer check pending |
 
@@ -61,6 +61,14 @@ CI and release workflows; hash-pinned lockfiles; security notice.
   from unknown to pass. Three P1-on-TRL runs sit near the 2× pass band (none near the 10×
   fail line), so a second computer may report them differently; this was recorded before
   any such check (`docs/m0_findings.md`).
+- **GitHub CI (cloud virtual machines; not the second computer):** first run all green.
+  122 tests pass on Ubuntu; 72 control runs (pinned stack and latest releases), **0 fails**,
+  35 of 36 verdicts identical to this computer in each job; the bank on GitHub's Windows
+  runner, **12 of 12 identical**. The one change is the borderline `p1-trl` TinyLlama run
+  (1.96× → 3.55×: pass → unknown), the change recorded in advance; nothing came near the
+  10× fail line.
+- **Upstream main:** the weekly upstream workflow's first run (transformers 5.23.0.dev0,
+  trl 1.18.0.dev0) passed: 36 controls, 0 fails, no verdict needing triage.
 - **Injected defects:** 49 of 49 applicable caught (a first run's 2 misses were a fault in
   the injected defect, published in `docs/bank_results.md`).
 - **Notable facts about current libraries:** TRL turns bf16 mixed precision on by default;
@@ -89,7 +97,14 @@ bank runner, setup and the comparison tool.
 ## Repository and publishing
 
 - GitHub: **private** repository `shreyasraut0707/Training-Stack-Conformance-Layer`
-  (created 2026-11-01), branch `main`; the spec PDF is not in it.
+  (created 2026-11-01), branch `main`; the spec PDF is not in it. Secret scan: no tokens,
+  keys, passwords or binary files. Before it could ever become public: replace the 7
+  example paths that contain your Windows user folder name, and decide whether your
+  commits should show your e-mail address (GitHub offers a private "noreply" address).
+- CI: `ci.yml` (tests, controls, bank; on every push, the bank also weekly), `upstream.yml`
+  (controls against upstream `main`; weekly and on demand), `release.yml` (PyPI only on a
+  published release; TestPyPI rehearsal on demand). The first run cost about USD 0.20 of
+  the private repository's monthly allowance.
 - PyPI: **nothing published.** The package builds and passes `twine check --strict`; the
   release workflow publishes with Trusted Publishing and attestations, with a TestPyPI
   rehearsal. Blocked on the final name (`conform` is taken) and on your accounts and
