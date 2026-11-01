@@ -25,15 +25,16 @@ Final report: `docs/COMPLETION_REPORT.md`.
    recorded in `docs/calibration.md`.
 2. Spec Section 14: contact TRL and Transformers maintainers before public claims
    (recommended: yes); first public artifact (the tool or the bank write-up).
-3. The unused `bank-ga-fixed` environment (transformers 4.46.3, about 1.4 GB): keep or delete.
+3. ~~The unused `bank-ga-fixed` environment~~: **decided 2026-11-01: keep it until all final
+   verification is complete.**
 4. **Final name:** `conform` is taken on PyPI and GitHub; `training-stack-conform` and
    `conform-probes` are free on PyPI today (`docs/publishing_steps.md`). No upload is
    possible until this is decided.
-5. **Borderline P1-on-TRL runs at a future second-computer check:** whether a pass ↔ info
-   (unknown) change on `p1-trl` for SmolLM2, TinyLlama or Qwen2.5 counts against G4. They
-   sit near the 2× pass band and moved with the CPU thread count on this computer
-   (`docs/m0_findings.md`, "Extra single-computer evidence for G4"). Recorded before any
-   second-computer run; the criterion and thresholds are unchanged.
+5. **Borderline P1-on-TRL runs (G4):** they move between pass and unknown with the CPU
+   thread count and on GitHub's runners (TinyLlama 1.96× → 3.55×). The spec counts any
+   changed verdict as a probe defect (Section 10.2, step 2). Recommended: option A, fix the
+   probe's noise floor for TRL's kernel without changing 2× / 10×; alternatives B and C in
+   `docs/m0_findings.md`, "G4 against the spec's text". Nothing changed until you decide.
 6. **When the repository becomes public** (recommended: just before the first real release,
    after contacting maintainers; `docs/publishing_steps.md`, Step B).
 
@@ -100,3 +101,8 @@ Final report: `docs/COMPLETION_REPORT.md`.
 - 2026-11-01: first upstream run 41328069985 (transformers 5.23.0.dev0, trl 1.18.0.dev0
   from `main`): success; 36 controls, 0 fails, verdicts identical to the CI runs on the
   current releases.
+- 2026-11-01: M3 preparation: the agent test folder checked (files present, server uses
+  this project's current code); `conform setup --agent codex` now sets Codex's tool and
+  startup time limits (defaults 60 s and 10 s are shorter than a `diagnose` run);
+  `docs/m3_agent_check_steps.md` rewritten. G4 reviewed against the spec's text (any
+  changed verdict is a probe defect); recommendation recorded, criteria unchanged.

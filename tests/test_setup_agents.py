@@ -36,7 +36,8 @@ def test_codex_adds_or_replaces_its_table_only(tmp_path):
     apply(plan("codex", python="py", home=tmp_path))
     data = tomllib.loads(config.read_text(encoding="utf-8"))
     assert data["model"] == "x" and data["other"] == {"key": 1}
-    assert data["mcp_servers"]["conform"] == {"command": "py", "args": ["-m", "conform.mcp_server"]}
+    assert data["mcp_servers"]["conform"] == {"command": "py", "args": ["-m", "conform.mcp_server"],
+                                              "startup_timeout_sec": 30, "tool_timeout_sec": 3600}
     assert (tmp_path / ".agents" / "skills" / "conform" / "SKILL.md").exists()  # Codex's documented location
     assert not (tmp_path / ".codex" / "skills").exists()
 

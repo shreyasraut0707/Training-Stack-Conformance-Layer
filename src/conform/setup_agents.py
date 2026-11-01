@@ -46,13 +46,21 @@ def _claude_mcp_json(project: Path, python: str) -> Change:
                   "Claude Code project-scope MCP server registration (.mcp.json)")
 
 
+# Codex stops a tool call after 60 s and a server start after 10 s by default; a diagnose
+# run executes several probes of up to 900 s each.
+CODEX_TOOL_TIMEOUT_SEC = 3600
+CODEX_STARTUP_TIMEOUT_SEC = 30
+
+
 def _codex_config(home: Path, python: str) -> Change:
     path = home / ".codex" / "config.toml"
     old = path.read_text(encoding="utf-8") if path.exists() else ""
     if old:
         tomllib.loads(old)  # refuse to edit a file that is not valid TOML
     block = (f"[mcp_servers.conform]\ncommand = {json.dumps(python)}\n"
-             f'args = ["-m", "conform.mcp_server"]\n')
+             f'args = ["-m", "conform.mcp_server"]\n'
+             f"startup_timeout_sec = {CODEX_STARTUP_TIMEOUT_SEC}\n"
+             f"tool_timeout_sec = {CODEX_TOOL_TIMEOUT_SEC}\n")
     pattern = re.compile(r"^\[mcp_servers\.conform\]\n(?:(?!\[).*\n?)*", re.MULTILINE)
     new = pattern.sub(block, old) if pattern.search(old) else (old.rstrip("\n") + "\n\n" if old else "") + block
     tomllib.loads(new)

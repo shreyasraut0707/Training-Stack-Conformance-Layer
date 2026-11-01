@@ -1,63 +1,83 @@
 # M3 agent check: step by step
 
 M3's exit criterion (spec Section 11.1): **a clean install and a `diagnose` run work end to
-end in both agents** (Claude Code and Codex).
+end in both agents** (Claude Code and Codex). Both checks use this one computer.
 
-Already verified on this computer: a clean install of the built wheel in a fresh environment
-(command, skill and MCP server work); an MCP client running `diagnose` end to end over stdio
-(`tests/test_mcp_server.py`). What remains is the run **inside** each agent. It needs your
-sign-in and your trust of a folder, so it is yours to do. Both checks use one computer.
+Already verified: a clean install of the built wheel in a fresh environment (command, skill
+and MCP server work); an MCP client running `diagnose` end to end over stdio
+(`tests/test_mcp_server.py`, 76 s). What remains is the same run **inside** each agent, with
+you at the keyboard (it needs your sign-in and your approval of the folder and the server).
 
-A test folder is already prepared: `C:\Users\Shreyas\conform-agent-test` (made by
-`conform setup --agent claude-code --apply`). It contains `.mcp.json` (registers the
-`conform` MCP server, using the `conform-agent` environment), the skill in
+**The test folder** `C:\Users\Shreyas\conform-agent-test` is ready (checked 2026-11-01). It
+contains `.mcp.json` (registers the `conform` MCP server, run by the `conform-agent`
+environment, which uses this project's current code), the skill in
 `.claude\skills\conform\SKILL.md`, and the example recipe `sft.yaml` with `rows.json`.
 
-## Claude Code (no installation needed: the desktop app is Claude Code)
+**The request to type** (the same in both agents):
 
-1. In the Claude desktop app, open the **Code** tab and start a **new session** in the folder
-   `C:\Users\Shreyas\conform-agent-test`. When asked whether to trust the folder, choose to
-   trust it (it only contains the files listed above).
-2. When Claude Code asks whether to use the project's MCP server `conform`, approve it.
-3. Type exactly:
-   > My fine-tuned model never stops generating. Use the conform MCP server's diagnose tool
-   > with symptom no-stop and the recipe sft.yaml in this folder. Do not run Python yourself.
-4. Wait (a few minutes: real probes run).
-5. **Pass if:** the agent calls `diagnose` from the `conform` server; reports P7, P2 and P3
-   with their statuses (expected: all three pass for this recipe) and evidence classes
-   (seen / inferred / unknown); reads out any unknown item; and gives the report path (a
-   `conform-reports\diagnose-no-stop_…\report.md` file inside the test folder).
-6. Tell me the result, or copy the agent's last message to me. I will record it.
+> My fine-tuned model never stops generating. Use the conform MCP server's diagnose tool
+> with symptom no-stop and the recipe sft.yaml in this folder. Do not run Python yourself.
 
-## Codex
+**Pass if** the agent (1) calls `diagnose` from the `conform` server; (2) reports P7, P2 and
+P3 with their statuses (expected for this recipe: all three pass) and evidence classes
+(seen / inferred / unknown); (3) reads out any unknown item rather than hiding it; and
+(4) gives the report path: a `conform-reports\diagnose-no-stop_…\report.md` file in the
+test folder. A run takes about 1 to 3 minutes.
 
-1. **Install** (PowerShell; this is OpenAI's official installer from the Codex README):
+## Part 1: Claude Code (no installation: this desktop app is Claude Code)
+
+1. In the Claude desktop app, go to the **Code** tab and start a **new session**.
+2. Choose the folder `C:\Users\Shreyas\conform-agent-test` for it (not the project folder).
+3. If asked whether to trust the folder, choose **Trust** (it holds only the four files above).
+4. If asked whether to use the project's MCP server **conform**, choose **Allow** / **Use**.
+   (If you are not asked, type `/mcp` in that session to see whether `conform` is listed and
+   connected.)
+5. Paste the request above and press Enter.
+6. If the agent asks permission to run the `diagnose` tool, allow it.
+7. Wait for its answer (about 1 to 3 minutes).
+8. Copy the agent's **whole final message** and paste it to me in this session. Also tell me
+   if anything was refused or failed.
+
+I then check the report file it wrote and record the result.
+
+## Part 2: Codex
+
+**Step 1. Install** (PowerShell; the official installer from OpenAI's Codex README):
 
 ```powershell
 powershell -ExecutionPolicy ByPass -c "irm https://chatgpt.com/codex/install.ps1 | iex"
 ```
 
-   Alternative, since Node.js is already installed: `npm install -g @openai/codex`.
+   Alternative (Node.js 24 is already installed): `npm install -g @openai/codex`.
+   Close and reopen PowerShell afterwards, then check:
 
-2. **Sign in:** run `codex` in any folder and choose **Sign in with ChatGPT** (needs a
-   ChatGPT Plus, Pro, Business, Edu or Enterprise plan), or sign in with an OpenAI API key.
-3. **Register the server and skill** (first look, then apply; the existing
-   `~/.codex/config.toml` is backed up first):
+```powershell
+codex --version
+```
+
+**Step 2. Sign in:** run `codex` and choose **Sign in with ChatGPT** (needs a ChatGPT Plus,
+Pro, Business, Edu or Enterprise plan) or sign in with an OpenAI API key. Then quit Codex
+(type `/quit` or press Ctrl+C).
+
+**Step 3. Register the server and the skill.** First look at the plan (changes nothing):
 
 ```powershell
 & $HOME\.venvs\conform-agent\Scripts\conform.exe setup --agent codex
 ```
 
+   Then apply it:
+
 ```powershell
 & $HOME\.venvs\conform-agent\Scripts\conform.exe setup --agent codex --apply
 ```
 
-   This adds an `[mcp_servers.conform]` table to `~/.codex/config.toml` and the skill to
-   `~/.agents/skills/conform/SKILL.md` (the locations in the Codex documentation, read on
-   2026-11-01; not yet confirmed against a running Codex). Codex's own command
-   `codex mcp add conform -- <python> -m conform.mcp_server` is an alternative for the server.
+   This creates `~/.codex/config.toml` with an `[mcp_servers.conform]` table (backing up any
+   existing file first) and copies the skill to `~/.agents/skills/conform/SKILL.md`. The
+   table sets `tool_timeout_sec = 3600` and `startup_timeout_sec = 30`: Codex's defaults
+   (60 s per tool call, 10 s to start a server) are shorter than a real `diagnose` run. These
+   locations and keys come from the Codex documentation; this check is what confirms them.
 
-4. **Run it:**
+**Step 4. Run it:**
 
 ```powershell
 cd $HOME\conform-agent-test
@@ -67,12 +87,17 @@ cd $HOME\conform-agent-test
 codex
 ```
 
-   and type the same request as for Claude Code.
-5. **Pass if:** the same as for Claude Code. If Codex does not see the server or the skill,
-   copy its message to me: that is exactly what this check is for.
+   If Codex asks whether to trust the folder, choose yes. Type `/mcp` to check that
+   `conform` is listed, then paste the request above. Approve the `diagnose` tool call if
+   asked.
+
+**Step 5.** Copy Codex's whole final message to me, or any error. If Codex does not see the
+server or the skill, that message is exactly what this check is for.
 
 ## Undo
 
-`conform setup` wrote backups next to every file it changed (`*.bak-<timestamp>`). To undo:
-delete the folder `C:\Users\Shreyas\conform-agent-test`; remove the `[mcp_servers.conform]`
-table from `~/.codex/config.toml` (or restore its backup); delete `~/.agents/skills/conform`.
+`conform setup` writes a backup next to every file it changes (`*.bak-<timestamp>`). To
+undo: delete the folder `C:\Users\Shreyas\conform-agent-test`; delete
+`~/.codex/config.toml` (or restore its backup, if one was made); delete
+`~/.agents/skills/conform`. Uninstall Codex with `npm uninstall -g @openai/codex` if you
+installed it with npm.

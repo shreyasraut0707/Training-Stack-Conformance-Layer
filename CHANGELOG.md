@@ -32,6 +32,9 @@ stability threshold still needs the second-machine check and M3 needs a run insi
   setuptools ≥ 77), so the build has no deprecation warnings; `twine check --strict` passes.
 - Release workflow: `twine check` before upload, and a TestPyPI rehearsal on "Run workflow"
   (environment `testpypi`); real PyPI only on a published release (environment `pypi`).
+- `conform setup --agent codex` sets `tool_timeout_sec = 3600` and `startup_timeout_sec = 30`
+  (Codex's defaults, 60 s and 10 s, are shorter than a `diagnose` run).
+- The weekly upstream run is its own workflow (`upstream.yml`) and can be started alone.
 - CI: time limits on every job, and a newer push cancels the older run (private
   repositories have a limited Actions allowance).
 

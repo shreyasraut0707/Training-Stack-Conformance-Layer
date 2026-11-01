@@ -326,3 +326,30 @@ started by hand, commit `581d4a0`): **success**, 6 min 32 s, transformers 5.23.0
 trl 1.18.0.dev0 from `main`. 36 control runs, **0 fails**; verdicts identical to the CI runs
 on the current releases (35 of 36 identical to this computer, the same borderline `p1-trl`
 TinyLlama run). No upstream change needs triage today.
+
+## 2026-11-01 · G4 against the spec's text: the borderline P1-on-TRL runs
+
+**What the spec says (read in the PDF).**
+- Section 14 (go / no-go table), G4: "Identical verdicts across 10 repeated runs on one machine and a second
+  spot check" ("Flaky verdicts destroy trust").
+- Section 10.2, step 2: "Repeat every probe at least ten times on two machines in
+  deterministic CPU float32 mode. Any verdict that changes counts as a defect in the probe."
+- Figure 7: three outcomes. Inside the floor is pass, clearly above is fail, and in
+  between is "unclear: report as unknown". So unknown is a verdict of its own.
+
+**Reading.** Under that text, `p1-trl` moving between pass and unknown across machines (CI,
+cloud VMs) or across thread counts (this computer) is a **verdict change, and so a defect in
+the P1-on-TRL probe**, even though it never comes near a fail. Transformers' P1 and P1M did
+not move (0.97× to 1.05× everywhere). Nothing changes on one machine with a fixed setup
+(10 repeats, spread 0), which is why G4's one-machine part is met.
+
+**Options (owner's decision; nothing has been changed).**
+
+| Option | What it means | Effect |
+|---|---|---|
+| **A. Treat it as a probe defect and fix the probe (recommended)** | P1's own limitation says its noise floor "does not sample" the rounding of TRL's chunked float32 log-prob kernel. Measure the floor through the same TRL loss path, so the floor moves with the kernel on each machine. The 2× pass band and 10× fail multiplier stay as decided | follows the spec's rule; needs a code change, then calibration, mutation suite, controls and the 10 repeats rerun; result not known in advance |
+| B. Count pass ↔ unknown as "not a change" | changes G4's comparison rule | contradicts "any verdict that changes"; needs your explicit approval of a criteria change |
+| C. Leave P1-on-TRL out of the stability claim | report it as unstable across machines | honest but narrows M0's scope (M0 names P1 on TRL SFT) |
+
+Until decided, the comparison rule and thresholds are unchanged, and every report on these
+runs states the borderline.

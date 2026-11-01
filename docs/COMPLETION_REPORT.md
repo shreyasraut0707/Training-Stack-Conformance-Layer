@@ -87,6 +87,10 @@ bank runner, setup and the comparison tool.
 - CPU only: GPU kernels, mixed-precision GPU paths, DeepSpeed, FSDP and multi-GPU are not
   tested (P1M covers two CPU processes).
 - P1's pass band (2×) lets TRL's float32 kernel rounding read as unknown (by decision).
+  Across machines and thread counts, three P1-on-TRL runs move between pass and unknown;
+  under the spec's rule ("any verdict that changes counts as a defect in the probe") this
+  is a P1-on-TRL stability defect awaiting your decision (recommended: fix the probe's
+  noise floor; thresholds unchanged).
 - Case A's bank pair differs in 22 packages (cases B and C differ only in the library).
 - DPO and reinforcement-learning trainers are out of scope (DPO until a confirmed DPO bug).
 - Codex's configuration format and skill location are not verified against a running Codex.
@@ -118,10 +122,10 @@ bank runner, setup and the comparison tool.
 3. **Second-computer spot check** (closes M0's G4 and M4): pending while you have one
    computer; if you ever borrow another Windows computer for about two hours:
    `docs/g4_second_machine_steps.md`.
-4. **Decisions:** contacting maintainers before public claims; the first public artifact;
-   when the repository becomes public; how to count a pass ↔ unknown change on the three
-   borderline P1-on-TRL runs at a second-computer check; keeping or deleting the unused
-   `bank-ga-fixed` environment (1.4 GB).
+4. **Decisions:** how to handle the borderline P1-on-TRL runs (options A, B, C in
+   `docs/m0_findings.md`; A recommended); contacting maintainers before public claims; the
+   first public artifact; when the repository becomes public. (`bank-ga-fixed` is kept
+   until all final verification is complete, by your decision.)
 
 When you bring back the agent outcomes or second-computer results, they are compared and
 recorded, and the milestones are marked complete only if they pass.
