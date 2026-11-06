@@ -4,6 +4,11 @@ The floor is measured, not assumed: the oracle's reference step is re-run with t
 micro-batches in reverse order and in float32, and the largest gap to the float64
 reference is the floor. A stack fails only when it is clearly above that floor.
 
+A probe can widen the sample with other mathematically identical batchings of the same rows
+(for example without padding, or all rows in one batch, as trainers feed them) and with the
+work split over several CPU thread counts, which change the order sums are added in and so
+differ between computers. Every sample is the oracle's own maths, never the library's.
+
 The loss floor is never below float32's resolution, because trainers report their
 loss as a float32 number and cannot be more precise than that. The measured floor is
 the largest of only a few samples of rounding noise, and the stack under test is one
@@ -25,6 +30,9 @@ PROVISIONAL_MULTIPLIER = 10.0
 
 # Relative precision of a float32 number (about 1.2e-7).
 FLOAT32_RESOLUTION = float(torch.finfo(torch.float32).eps)
+
+# CPU thread counts sampled, besides the current one, when a probe asks for thread samples.
+FLOOR_THREADS = (1, 2, 4)
 
 INSIDE, UNCLEAR, ABOVE = "inside", "unclear", "above"
 
@@ -85,14 +93,24 @@ def reference_step(model, micro_batches, *, dtype=torch.float64, reverse=False):
     return loss.item(), flat_gradient(ref.parameters())
 
 
-def measure_floor(model, micro_batches):
-    """Return (reference loss, reference gradient, Floor) at float64."""
+def measure_floor(model, micro_batches, *, arrangements=(), sample_threads=False):
+    """Return (reference loss, reference gradient, Floor) at float64.
+
+    `arrangements` are other batchings of the same rows (lists of batches), sampled in
+    float32 in both orders. With `sample_threads`, every float32 sample is also taken with
+    the work split over FLOOR_THREADS CPU threads; the thread count is restored afterwards.
+    """
     ref_loss, ref_grad = reference_step(model, micro_batches)
-    variants = [
-        reference_step(model, micro_batches, reverse=True),
-        reference_step(model, micro_batches, dtype=torch.float32),
-        reference_step(model, micro_batches, dtype=torch.float32, reverse=True),
-    ]
+    variants = [reference_step(model, micro_batches, reverse=True)]
+    current = torch.get_num_threads()
+    try:
+        for threads in sorted({current, *FLOOR_THREADS}) if sample_threads else [current]:
+            torch.set_num_threads(threads)
+            for batches in (micro_batches, *arrangements):
+                variants += [reference_step(model, batches, dtype=torch.float32, reverse=reverse)
+                             for reverse in (False, True)]
+    finally:
+        torch.set_num_threads(current)
     floor = Floor(
         loss=max(FLOAT32_RESOLUTION, *(relative_gap(loss, ref_loss) for loss, _ in variants)),
         gradient=max(relative_gap(grad, ref_grad) for _, grad in variants),

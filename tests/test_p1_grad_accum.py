@@ -98,9 +98,9 @@ def test_injected_position_zero_count_is_a_normalisation_fail():
 
 @pytest.mark.parametrize("model_id", DEFAULT_TARGETS)
 def test_current_sft_trainer_does_not_fail(model_id):
-    """TRL's float32 log-prob kernel rounds more than the measured floor allows for, so
-    its accumulated update may land in the unclear zone (docs/m0_findings.md). It must
-    never fail, and anything outside the pass band must be labelled unknown, not seen."""
+    """TRL's float32 log-prob kernel can still round near the pass band, so its accumulated
+    update may land in the unclear zone (docs/calibration.md). It must never fail, and
+    anything outside the pass band must be labelled unknown, not seen."""
     result = cached_run(model_id, "trl")
     assert result.status in (Status.PASS, Status.INFO), result.to_dict()
     assert result.observed["trainer"] == "TRL SFTTrainer"
@@ -121,3 +121,4 @@ def test_result_records_environment_and_limits():
     assert result.environment["trl"] is not None
     assert result.reproducer.startswith("python -m conform.probes.p1_grad_accum")
     assert any("calibrated" in item and "docs/calibration.md" in item for item in result.limitations)
+    assert "unpadded" in result.observed["floor_samples"] and "CPU threads" in result.observed["floor_samples"]

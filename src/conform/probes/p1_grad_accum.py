@@ -18,8 +18,8 @@ from transformers import Trainer, TrainingArguments, default_data_collator
 
 from conform.environment import capture_environment
 from conform.noise_floor import (
-    ABOVE, INSIDE, PROVISIONAL_MULTIPLIER, PROVISIONAL_PASS_BAND, UNCLEAR, classify, flat_gradient,
-    measure_floor, relative_gap,
+    ABOVE, FLOOR_THREADS, INSIDE, PROVISIONAL_MULTIPLIER, PROVISIONAL_PASS_BAND, UNCLEAR, classify,
+    flat_gradient, measure_floor, relative_gap,
 )
 from conform.oracle import IGNORE_INDEX
 from conform.proxy_model import build_proxy
@@ -39,15 +39,17 @@ LIMITATIONS = [
     "proxy model; real weights not used",
     "single-process CPU float32; GPU, mixed precision and distributed paths not tested",
     f"noise-floor fail multiplier ({PROVISIONAL_MULTIPLIER:g}x) calibrated on injected defects and "
-    f"held-out historical cases; pass band ({PROVISIONAL_PASS_BAND:g}x) kept by decision, so TRL's "
-    "unmodelled kernel rounding reads as unknown (docs/calibration.md)",
+    f"held-out historical cases; pass band ({PROVISIONAL_PASS_BAND:g}x) kept by decision "
+    "(docs/calibration.md)",
+    "noise floor sampled with the oracle's own float32 maths in the batchings the trainers use "
+    "(padded, unpadded, one batch) and over several CPU thread counts",
     "update checked as the accumulated gradient handed to the optimizer "
     "(plain SGD, no clipping); optimizer maths itself not tested",
 ]
 TRL_LIMITATION = (
-    "TRL's chunked log-prob kernel computes in float32 whatever the model dtype; the noise "
-    "floor does not sample its rounding, so its accumulated update can read as unknown "
-    "(docs/m0_findings.md)"
+    "TRL's chunked log-prob kernel computes in float32 whatever the model dtype; the floor does "
+    "not use the library's own code, so the kernel's rounding can still put an accumulated update "
+    "near the pass band, where it reads as unknown (docs/calibration.md)"
 )
 
 
@@ -67,6 +69,14 @@ def build_rows(vocab_limit: int, pad_id: int, seed: int) -> list[dict[str, torch
 
 def supervised_targets(rows) -> list[int]:
     return [int((row["labels"][1:] != IGNORE_INDEX).sum()) for row in rows]
+
+
+def floor_arrangements(rows) -> tuple[list[dict], list[dict]]:
+    """The same rows batched as the trainers batch them: one row per micro-batch without
+    padding (TRL's collator pads each batch to its own longest row), and all rows in one batch."""
+    unpadded = [{k: v[row["attention_mask"].bool()].unsqueeze(0) for k, v in row.items()} for row in rows]
+    one_batch = [{k: torch.stack([row[k] for row in rows]) for k in rows[0]}]
+    return unpadded, one_batch
 
 
 class _CapturingSGD(torch.optim.SGD):
@@ -167,7 +177,8 @@ def run(
         pad_id = next(i for i in (tokenizer.pad_token_id, tokenizer.eos_token_id, 0) if i is not None)
         rows = build_rows(len(tokenizer), pad_id, seed)
         micro_batches = [{k: v.unsqueeze(0) for k, v in row.items()} for row in rows]
-        ref_loss, ref_grad, floor = measure_floor(model, micro_batches)
+        ref_loss, ref_grad, floor = measure_floor(model, micro_batches, arrangements=floor_arrangements(rows),
+                                                  sample_threads=True)
         runs = {
             "accumulated (4 micro-batches x 1 row)": run_trainer(
                 copy.deepcopy(model), tokenizer, rows, trainer=trainer, batch_size=1,
@@ -188,6 +199,8 @@ def run(
         "reference_loss": ref_loss,
         "floor_loss": floor.loss,
         "floor_update": floor.gradient,
+        "floor_samples": "float64 in reverse order; float32 padded, unpadded and as one batch, both orders, "
+                         f"with {sorted({torch.get_num_threads(), *FLOOR_THREADS})} CPU threads",
         "pass_band": PROVISIONAL_PASS_BAND,
         "multiplier": PROVISIONAL_MULTIPLIER,
     }
