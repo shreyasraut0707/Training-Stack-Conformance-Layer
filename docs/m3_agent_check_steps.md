@@ -94,6 +94,39 @@ codex
 **Step 5.** Copy Codex's whole final message to me, or any error. If Codex does not see the
 server or the skill, that message is exactly what this check is for.
 
+## Part 3: the same checks with a clean install (closes M3)
+
+Parts 1 and 2 passed on 2026-11-03, but both agents used `conform-agent`, an editable
+development install. M3 asks for a **clean install** and a `diagnose` run in both agents, so
+the two checks are repeated against `C:\Users\Shreyas\.venvs\conform-clean`: a fresh
+environment with the built wheel installed normally (not editable; the same 78 packages,
+hash-pinned from `bank/envs/conform-agent.lock`).
+
+A second test folder is ready: `C:\Users\Shreyas\conform-clean-test` (the same `sft.yaml`
+and `rows.json`; `.mcp.json` and the skill written by the clean environment's
+`conform setup`). The first test folder and its reports stay as they are.
+
+**Claude Code:** as in Part 1, but start the new session in
+`C:\Users\Shreyas\conform-clean-test`. Trust the folder, allow the `conform` server, paste
+the same request, and copy the final reply to me.
+
+**Codex:** `~/.codex/config.toml` already points at the clean environment (done on
+2026-11-03 with the clean environment's `conform setup`; the previous file is backed up as
+`config.toml.bak-20261103-235618`; `codex mcp list` shows `conform` enabled). Then:
+
+```powershell
+cd $HOME\conform-clean-test
+```
+
+```powershell
+codex
+```
+
+   Paste the same request and copy the final reply to me.
+
+**Pass if:** the same four conditions as in Parts 1 and 2, and the report appears under
+`C:\Users\Shreyas\conform-clean-test\conform-reports\`.
+
 ## Undo
 
 `conform setup` writes a backup next to every file it changes (`*.bak-<timestamp>`). To

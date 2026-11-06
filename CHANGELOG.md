@@ -3,10 +3,11 @@
 Versions follow the spec's milestones. Evidence for each entry is in `docs/m0_findings.md`
 and `bank/results/`.
 
-## 0.2.0.dev0 (M2 to M4 built; M3 and M4 not yet complete): 2026-11-01
+## 0.2.0.dev0 (M2 to M4 built; M4 not yet complete): 2026-11-01
 
-Pre-release version: the v0.2 code is in place and tested (123 tests pass), but M4's
-stability threshold still needs the second-machine check and M3 needs a run inside the agents.
+Pre-release version: the v0.2 code is in place and tested (125 tests pass), but M4's
+stability threshold still needs the second-machine check. M3 is complete (2026-11-04): a
+clean install and a `diagnose` run work end to end in both Claude Code and Codex.
 
 - Clean install verified from the built wheel in a fresh environment; the skill now ships
   inside the package (`conform/skills/conform/SKILL.md`, kept identical to `skills/`).
@@ -32,6 +33,17 @@ stability threshold still needs the second-machine check and M3 needs a run insi
   setuptools ≥ 77), so the build has no deprecation warnings; `twine check --strict` passes.
 - Release workflow: `twine check` before upload, and a TestPyPI rehearsal on "Run workflow"
   (environment `testpypi`); real PyPI only on a published release (environment `pypi`).
+- MCP server: the descriptions of `diagnose`, `run_all` and `run_probe` tell the agent to
+  quote each finding's evidence class and read every unknown item aloud (spec Section 9);
+  that note now comes first in each result, and each probe's result counts its findings
+  per evidence class. In a clean-install run Codex had not opened the skill and left the
+  classes out. The tool descriptions, the note (which names the report's path) and the
+  skill now also ask the agent to give the user the full report's path (spec Figure 9).
+- Skill: limits corrected (P1 passes up to 2× and fails above 10× its noise floor; P1M
+  uses two CPU processes), replacing "provisional until calibrated".
+- Fixed: a second `conform setup --agent codex` failed with `TOMLDecodeError` when the
+  Python path had backslashes (every Windows path), because the replacement text's
+  backslashes were read as escapes. Found by the clean-install check; regression test added.
 - `conform setup --agent codex` sets `tool_timeout_sec = 3600` and `startup_timeout_sec = 30`
   (Codex's defaults, 60 s and 10 s, are shorter than a `diagnose` run).
 - The weekly upstream run is its own workflow (`upstream.yml`) and can be started alone.

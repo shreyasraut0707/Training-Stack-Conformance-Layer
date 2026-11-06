@@ -1,23 +1,24 @@
 # Training-Stack Conformance Layer: completion report
 
-Date: 2026-11-01 · Version: 0.2.0.dev0 · Source of truth:
+Date: 2026-11-04 · Version: 0.2.0.dev0 · Source of truth:
 `Training_Stack_Conformance_Layer_Illustrated_Spec.pdf` · Detailed status: `docs/PROGRESS.md`
 
 ## Bottom line
 
 **The project is not yet complete by the spec's acceptance criteria.** Everything that can
-be built and verified on this computer is done and tested (123 tests pass). Three
-acceptance checks remain open. The **second-computer spot check** (M0's G4 and M4's
+be built and verified on this computer is done and tested (125 tests pass). One
+acceptance check remains open: the **second-computer spot check** (M0's G4 and M4's
 stability threshold) is **pending**: the owner has only one computer, and it has not been
-replaced by a virtual machine, by CI or by more runs on this computer. The **runs inside
-Claude Code and Codex** (M3) need the owner at the keyboard.
+replaced by a virtual machine, by CI or by more runs on this computer. **M3 is complete**
+(2026-11-04): a clean install and a `diagnose` run work end to end in both agents, and
+with only the standard request each agent met all four pass conditions.
 
 | Milestone | Status |
 |---|---|
 | M0 Spike | Not complete: conditional go. G1, G2, G3 met; G4 met on this computer, with extra same-computer evidence; the second-computer spot check is pending (one computer only) |
 | M1 v0.1 | **Complete** (0.1.0) |
 | M2 Bank | **Complete**: results published with misses; the CI matrix ran on GitHub with every job green (runs 41326929545 and 41328058562), and the weekly upstream run works (41328069985) |
-| M3 Agents | Not complete: everything built; clean install and MCP `diagnose` verified; the run inside the two agents is missing |
+| M3 Agents | **Complete** (2026-11-04): clean install plus `diagnose` end to end in both agents; with only the standard request, Claude Code and Codex each met all four pass conditions |
 | M4 v0.2 | Not complete: P4, P5, P1M built; stability and controls met on this computer (120 of 120, plus a fresh environment and one CPU thread); second-computer check pending |
 
 ## What was built
@@ -71,15 +72,60 @@ CI and release workflows; hash-pinned lockfiles; security notice.
   trl 1.18.0.dev0) passed: 36 controls, 0 fails, no verdict needing triage.
 - **Injected defects:** 49 of 49 applicable caught (a first run's 2 misses were a fault in
   the injected defect, published in `docs/bank_results.md`).
+- **Inside Claude Code (M3, 2026-11-03):** in a new Code-tab session of the Claude desktop
+  app (model Claude Opus 5.5) in the test folder, the agent called `diagnose` (no-stop,
+  `sft.yaml`) on the `conform` MCP server without running Python, reported P7, P2 and P3
+  (3 pass) with their evidence classes, and gave the report path
+  (`conform-reports\diagnose-no-stop_2026-11-03_230813\report.md`); the report files
+  match its message. In a follow-up `run_all` (5 pass, 2 info, 1 not tested) it read out
+  both P1 unknown items word for word. All four pass conditions met.
+- **Inside Codex (M3, 2026-11-03):** Codex CLI 0.166.0 in the test folder called
+  `diagnose` (no-stop, `sft.yaml`) on the `conform` MCP server without running Python
+  (a first call with a malformed symptom got a clear error, and Codex corrected it after
+  reading the skill), reported P7, P2 and P3 (3 pass, all seen, "Unknown items: None") and
+  gave the report path (`conform-reports\diagnose-no-stop_2026-11-03_232910\`); the report
+  files match its message and the Claude Code run's report. All four pass conditions met.
+  Codex's session context confirms the skill location `~/.agents/skills` and the server
+  registration that `conform setup` writes.
+- **Clean-install runs (M3, 2026-11-04):** a fresh environment with the built wheel
+  (`~/.venvs/conform-clean`, not editable, hash-pinned dependencies), registered in both
+  agents by its own `conform setup`, in a new test folder. Both agents called `diagnose`
+  (no-stop, `sft.yaml`) on that server and gave the report path; both reports say 3 pass,
+  every finding seen, identical to the earlier runs. Claude Code described the evidence as
+  "directly observed, none inferred" and "no unknowns": all four conditions met. Codex
+  gave the statuses and "Unknown items: None reported" but quoted no evidence class for P2
+  and P3: three of four. Logs confirm each agent used only the clean environment.
+- **After the fix (2026-11-04):** the `diagnose` tool's description and result now ask the
+  agent to quote each finding's evidence class. A Codex rerun on the rebuilt clean install
+  reported every probe as "seen" with counts, said there were no unknown items, and gave
+  the report path; but its prompt also asked for the evidence classes. A further run with
+  only the standard request quoted the classes unprompted ("Seen:" for each probe, "no
+  inferred or unknown findings") but did not give the report path, which conform's skill
+  and tool did not then ask for (the spec's Figure 9 expects "a path to the full report").
+- **Closing runs (M3, 2026-11-04):** with the tool and the skill now also asking for the
+  report path (clean install rebuilt), one run in each agent with only the standard
+  request. Claude Code (2.1.309, Claude Opus 5.5) and Codex (0.166.0, `gpt-6-luna`) each
+  called `diagnose` (no-stop, `sft.yaml`) on the clean install's server without running
+  Python, reported P7, P2 and P3 (3 pass) with every finding labelled seen, said there
+  were no unknown items, and gave the report path (`…_004230` and `…_004406`); the two
+  reports are identical and match the replies. Codex did not open the skill, so the tool's
+  own description and note were enough. All four pass conditions met in both: **M3
+  complete.** (Recorded by the Claude Code session that made its run, checked against
+  both session logs.)
 - **Notable facts about current libraries:** TRL turns bf16 mixed precision on by default;
   the standard Transformers collator with a PAD = EOS tokenizer trains a model that never
   stops (measured by P7); Transformers isolates packed documents on CPU.
 
 ## Tests
 
-123 automated tests pass (122 in the main environment, 1 MCP end-to-end test in
+125 automated tests pass (124 in the main environment, 1 MCP end-to-end test in
 `conform-agent`), covering every probe, its injected defects, the reports, the CLI, the
-bank runner, setup and the comparison tool.
+bank runner, setup and the comparison tool. Run against the installed wheel instead of the
+source tree, 115 pass; the other 5 test repository-only parts (bank cases, controls file,
+scripts), which are not shipped in the package.
+
+The clean-install check found and fixed one real defect: a second `conform setup --agent
+codex` broke on Windows paths (regression test added; it fails on the old code).
 
 ## Limitations (stated in every report where they apply)
 
@@ -93,7 +139,8 @@ bank runner, setup and the comparison tool.
   noise floor; thresholds unchanged).
 - Case A's bank pair differs in 22 packages (cases B and C differ only in the library).
 - DPO and reinforcement-learning trainers are out of scope (DPO until a confirmed DPO bug).
-- Codex's configuration format and skill location are not verified against a running Codex.
+- Codex's configuration format and skill location: verified against a running Codex
+  (0.166.0) on 2026-11-03.
 - Lockfiles are specific to Windows and CPython 3.11.
 - The bank evidence shows the probes behave as specified for the listed cases and versions;
   it does not prove the tool finds unknown bugs or that these defects matter to most users.
@@ -116,16 +163,15 @@ bank runner, setup and the comparison tool.
 
 ## What you need to do personally
 
-1. **Agent check in Claude Code and Codex** (closes M3): `docs/m3_agent_check_steps.md`.
-2. **Final name, PyPI and TestPyPI accounts, publishing** (only when you approve):
+1. **Final name, PyPI and TestPyPI accounts, publishing** (only when you approve):
    `docs/publishing_steps.md`.
-3. **Second-computer spot check** (closes M0's G4 and M4): pending while you have one
+2. **Second-computer spot check** (closes M0's G4 and M4): pending while you have one
    computer; if you ever borrow another Windows computer for about two hours:
    `docs/g4_second_machine_steps.md`.
-4. **Decisions:** how to handle the borderline P1-on-TRL runs (options A, B, C in
+3. **Decisions:** how to handle the borderline P1-on-TRL runs (options A, B, C in
    `docs/m0_findings.md`; A recommended); contacting maintainers before public claims; the
    first public artifact; when the repository becomes public. (`bank-ga-fixed` is kept
    until all final verification is complete, by your decision.)
 
-When you bring back the agent outcomes or second-computer results, they are compared and
-recorded, and the milestones are marked complete only if they pass.
+When you bring back the second-computer results, they are compared and recorded, and M0
+and M4 are marked complete only if they pass.
