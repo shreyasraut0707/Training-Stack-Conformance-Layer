@@ -37,11 +37,13 @@ or full dataset.
   (P7) measured it. P2 facts about masking are mechanisms, not harm; P2's inferred findings
   say "confirm with P7".
 - There is no overall pass. Say "N pass, M fail, K not tested" and list what was not tested.
+- Give the user the path of the full report (the `report` field).
 - A pass means only "these listed behaviours held for these inputs on these versions".
 - Give the `reproducer` command for every fail.
 
 ## Limits to state when relevant
 
-Proxy models only (no real weights), single-process CPU (no GPU kernels, DeepSpeed or
-multi-GPU), and the thresholds of P1 are provisional until calibrated. A probe that cannot
-run reports `not_tested` with a reason; that is not a pass.
+Proxy models only (no real weights), CPU only (no GPU kernels, DeepSpeed or multi-GPU;
+P1M uses two CPU processes). P1 passes up to 2× its measured noise floor and fails above
+10×; in between it reports unknown, which small TRL rounding differences can cause. A probe
+that cannot run reports `not_tested` with a reason; that is not a pass.

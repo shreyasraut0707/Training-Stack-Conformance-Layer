@@ -11,6 +11,12 @@ def test_packaged_skill_matches_the_repository_skill():
     assert SKILL_SOURCE.read_bytes() == repo_copy.read_bytes()
 
 
+def test_skill_states_the_reporting_rules():
+    # Spec Section 9 and Figure 9: quote the evidence class, read unknowns aloud, give the report path.
+    text = SKILL_SOURCE.read_text(encoding="utf-8")
+    assert all(rule in text for rule in ("evidence class", "Read every **unknown** item", "path of the full report"))
+
+
 def test_dry_run_changes_nothing(tmp_path, capsys):
     assert main(["setup", "--agent", "claude-code", "--project", str(tmp_path)]) == 0
     assert "Nothing was changed" in capsys.readouterr().out
@@ -40,6 +46,16 @@ def test_codex_adds_or_replaces_its_table_only(tmp_path):
                                               "startup_timeout_sec": 30, "tool_timeout_sec": 3600}
     assert (tmp_path / ".agents" / "skills" / "conform" / "SKILL.md").exists()  # Codex's documented location
     assert not (tmp_path / ".codex" / "skills").exists()
+
+
+def test_codex_replaces_a_windows_path(tmp_path):
+    # A second setup replaces the table; backslashes in the path must survive the replacement.
+    first, second = r"C:\Users\me\.venvs\old\Scripts\python.exe", r"C:\Users\me\.venvs\new\Scripts\python.exe"
+    apply(plan("codex", python=first, home=tmp_path))
+    apply(plan("codex", python=second, home=tmp_path))
+    config = tomllib.loads((tmp_path / ".codex" / "config.toml").read_text(encoding="utf-8"))
+    assert config["mcp_servers"]["conform"]["command"] == second
+    assert apply(plan("codex", python=second, home=tmp_path)) == []
 
 
 def test_applying_twice_is_idempotent(tmp_path):

@@ -29,7 +29,7 @@ async def _session_calls(calls, cwd):
     async with stdio_client(params) as (read, write):
         async with ClientSession(read, write) as session:
             await session.initialize()
-            tools = sorted(t.name for t in (await session.list_tools()).tools)
+            tools = {t.name: t.description for t in (await session.list_tools()).tools}
             results = [_payload(await session.call_tool(name, args, read_timeout_seconds=900))
                        for name, args in calls]
             return tools, results
@@ -49,7 +49,10 @@ def test_agent_can_list_probes_and_run_diagnose(tmp_path):
                       encoding="utf-8")
     tools, (probes, diagnosis) = asyncio.run(_session_calls(
         [("list_probes", {}), ("diagnose", {"symptom": "no-stop", "recipe_path": str(recipe)})], tmp_path))
-    assert tools == ["diagnose", "diff_environments", "list_probes", "run_all", "run_probe"]
+    assert sorted(tools) == ["diagnose", "diff_environments", "list_probes", "run_all", "run_probe"]
+    # Spec Section 9: the agent quotes the evidence class; said where every agent looks.
+    assert all("evidence class" in tools[name] and "path of the full report" in tools[name]
+               for name in ("diagnose", "run_all", "run_probe"))
     assert {p["id"] for p in probes["probes"]} >= {"P1", "P2", "P3", "P6", "P7"}
     assert diagnosis["probes_in_order"] == ["P7", "P2", "P3"]
     assert [r["probe"] for r in diagnosis["results"]] == ["P7-eos-stopping", "P2-loss-bearing-tokens",
@@ -57,4 +60,8 @@ def test_agent_can_list_probes_and_run_diagnose(tmp_path):
     assert all(r["status"] == "pass" for r in diagnosis["results"]), diagnosis
     assert diagnosis["command"].startswith("conform diagnose --symptom no-stop")
     assert os.path.exists(diagnosis["report"])
-    assert "unknown" in diagnosis["note"]
+    assert list(diagnosis)[0] == "note" and "evidence class" in diagnosis["note"]
+    assert diagnosis["note"].endswith(f"Full report: {diagnosis['report']}")
+    for r in diagnosis["results"]:
+        assert set(r["evidence"]) == {"seen", "inferred", "unknown"}
+        assert r["evidence"]["seen"] == len(r["seen"]) or len(r["seen"]) == 5  # claims are capped at 5

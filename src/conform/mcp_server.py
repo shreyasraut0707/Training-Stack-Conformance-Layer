@@ -14,11 +14,19 @@ from pathlib import Path
 from conform.registry import PROBES, SYMPTOMS, available, load_recipe, selected_probes, unavailable_reason
 
 REPORTS_ROOT = Path.cwd() / "conform-reports"
+EVIDENCE_CLASSES = ("seen", "inferred", "unknown")
+# Spec Section 9: the agent quotes the evidence class and reads every unknown item aloud. Given
+# both in the tool descriptions and first in each result, since an agent may not open the skill.
+HOW_TO_REPORT = ("Tell the user each probe's status and quote each finding's evidence class (seen, "
+                 "inferred or unknown). Read every 'unknown' item to the user. Claim harm only when a "
+                 "behavioural probe (P7) confirmed it. Give the user the path of the full report "
+                 "(the 'report' field).")
 
 
 def _compact(result: dict) -> dict:
     findings = result.get("findings", [])
     return {"probe": result["probe"], "status": result["status"], "reason": result.get("reason"),
+            "evidence": {c: sum(f["evidence_class"] == c for f in findings) for c in EVIDENCE_CLASSES},
             "seen": [f["claim"] for f in findings if f["evidence_class"] == "seen"][:5],
             "inferred": [f["claim"] for f in findings if f["evidence_class"] == "inferred"],
             "unknown": [f["claim"] for f in findings if f["evidence_class"] == "unknown"],
@@ -33,10 +41,9 @@ def _run(recipe_path: str, probe_ids: list[str], label: str, meta: dict) -> dict
     results = run_probes(recipe, probe_ids)
     out = REPORTS_ROOT / datetime.now().strftime(f"{label}_%Y-%m-%d_%H%M%S")
     paths = write_reports(results, out, {**meta, "recipe": recipe_path, "model": recipe["model"]})
-    return {"summary": summary(results), "results": [_compact(r) for r in results],
-            "report": str(paths["markdown"]), "report_json": str(paths["json"]),
-            "note": "Read every 'unknown' item to the user. Claim harm only when a behavioural "
-                    "probe (P7) confirmed it; quote each finding's evidence class."}
+    note = f"{HOW_TO_REPORT} Full report: {paths['markdown']}"
+    return {"note": note, "summary": summary(results), "results": [_compact(r) for r in results],
+            "report": str(paths["markdown"]), "report_json": str(paths["json"])}
 
 
 def list_probes() -> dict:
@@ -51,25 +58,25 @@ def run_probe(probe_id: str, recipe_path: str) -> dict:
     """Run one probe against a recipe file and its sample rows."""
     if probe_id not in PROBES:
         return {"error": f"unknown probe {probe_id!r}; choose from {sorted(PROBES)}"}
-    return {"command": f"conform check --recipe {recipe_path} --probes {probe_id}",
-            **_run(recipe_path, [probe_id], f"probe-{probe_id}", {"command": "run_probe"})}
+    result = _run(recipe_path, [probe_id], f"probe-{probe_id}", {"command": "run_probe"})
+    return {"note": result.pop("note"), "command": f"conform check --recipe {recipe_path} --probes {probe_id}",
+            **result}
 
 
 def run_all(recipe_path: str) -> dict:
     """Run every available probe for a recipe; returns a summary and the report path."""
     probe_ids = selected_probes(load_recipe(recipe_path))
-    return {"command": f"conform check --recipe {recipe_path}",
-            **_run(recipe_path, probe_ids, "check", {"command": "run_all"})}
+    result = _run(recipe_path, probe_ids, "check", {"command": "run_all"})
+    return {"note": result.pop("note"), "command": f"conform check --recipe {recipe_path}", **result}
 
 
 def diagnose(symptom: str, recipe_path: str) -> dict:
     """Run the probes most related to a symptom (no-stop, worse-than-base), most direct first."""
     if symptom not in SYMPTOMS:
         return {"error": f"unknown symptom {symptom!r}; choose from {sorted(SYMPTOMS)}"}
-    return {"command": f"conform diagnose --symptom {symptom} --recipe {recipe_path}",
-            "probes_in_order": SYMPTOMS[symptom],
-            **_run(recipe_path, SYMPTOMS[symptom], f"diagnose-{symptom}",
-                   {"command": "diagnose", "symptom": symptom})}
+    result = _run(recipe_path, SYMPTOMS[symptom], f"diagnose-{symptom}", {"command": "diagnose", "symptom": symptom})
+    return {"note": result.pop("note"), "command": f"conform diagnose --symptom {symptom} --recipe {recipe_path}",
+            "probes_in_order": SYMPTOMS[symptom], **result}
 
 
 def diff_environments(from_env: str, to_env: str, recipe_path: str) -> dict:
@@ -91,6 +98,8 @@ def diff_environments(from_env: str, to_env: str, recipe_path: str) -> dict:
 
 
 TOOLS = (list_probes, run_probe, run_all, diagnose, diff_environments)
+for _tool in (run_probe, run_all, diagnose):  # the tool description is what every agent sees
+    _tool.__doc__ = f"{_tool.__doc__} {HOW_TO_REPORT}"
 
 
 def build_server():

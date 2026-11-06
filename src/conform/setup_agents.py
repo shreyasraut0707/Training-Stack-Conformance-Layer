@@ -62,10 +62,12 @@ def _codex_config(home: Path, python: str) -> Change:
              f"startup_timeout_sec = {CODEX_STARTUP_TIMEOUT_SEC}\n"
              f"tool_timeout_sec = {CODEX_TOOL_TIMEOUT_SEC}\n")
     pattern = re.compile(r"^\[mcp_servers\.conform\]\n(?:(?!\[).*\n?)*", re.MULTILINE)
-    new = pattern.sub(block, old) if pattern.search(old) else (old.rstrip("\n") + "\n\n" if old else "") + block
+    # A function replacement: a string one would read the backslashes of a Windows path as escapes.
+    new = (pattern.sub(lambda _: block, old) if pattern.search(old)
+           else (old.rstrip("\n") + "\n\n" if old else "") + block)
     tomllib.loads(new)
-    return Change(path, new, "Codex MCP server registration (~/.codex/config.toml); format from the "
-                             "Codex documentation, not yet verified against a running Codex")
+    return Change(path, new, "Codex MCP server registration (~/.codex/config.toml); format checked "
+                             "with Codex CLI 0.166.0")
 
 
 def _skill(target_dir: Path, note: str) -> Change:
