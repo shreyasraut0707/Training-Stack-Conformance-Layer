@@ -9,6 +9,13 @@ Pre-release version: the v0.2 code is in place and tested (125 tests pass), but 
 stability threshold still needs the second-machine check. M3 is complete (2026-11-04): a
 clean install and a `diagnose` run work end to end in both Claude Code and Codex.
 
+- P1's noise floor also samples the batchings the trainers use (unpadded rows, one batch)
+  and every float32 sample at 1, 2, 4 and the default number of CPU threads, all with the
+  oracle's own maths (`measure_floor(..., arrangements=..., sample_threads=True)`; P1M
+  unchanged). Correct TRL runs: largest 2.10× (was 3.82×); P1-on-TRL verdicts no longer
+  change with the thread count in the controls; detection, mutation suite and bank
+  unchanged; thresholds unchanged. A floor through TRL's own kernel was tried and rejected
+  (it is the trainer's own computation).
 - Clean install verified from the built wheel in a fresh environment; the skill now ships
   inside the package (`conform/skills/conform/SKILL.md`, kept identical to `skills/`).
 - Probe availability now reflects the installed stack (spec Section 9): a probe is "not

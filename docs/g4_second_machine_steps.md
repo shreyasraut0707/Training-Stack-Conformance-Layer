@@ -104,14 +104,17 @@ The three printed paths must end with these versions; if any differs, stop and r
 ```powershell
 & $HOME\.venvs\conform\Scripts\python.exe -m pytest -q
 ```
-Expected final line: `59 passed`.
+Expected: no failures (about 125 passed; the MCP test is skipped in this environment).
 
 ## Step 10: Run the spot check
 
+Close other large programs first: P1M runs three Python processes at once, and the first
+attempt on the primary laptop (7.3 GB of memory) ran out of memory.
+
 ```powershell
-& $HOME\.venvs\conform\Scripts\python.exe scripts\run_controls.py --only p1-transformers p1-trl p2-transformers p2-trl p3-trl p6-transformers p6-trl p7-trl
+& $HOME\.venvs\conform\Scripts\python.exe scripts\run_controls.py
 ```
-(The v0.1 controls, 24 runs; the M4 controls come separately below.)
+(All 36 controls: v0.1 and M4; about 10 minutes.)
 
 ```powershell
 $LASTEXITCODE
@@ -127,30 +130,17 @@ $LASTEXITCODE
 ```
 Expected: every row `match`, then `0`. If either is not 0, do not re-run: go to Step 11.
 
-**Added for M4 (v0.2 probes P4, P5, P1M; about 3 minutes):**
-
-```powershell
-& $HOME\.venvs\conform\Scripts\python.exe scripts\run_controls.py --only p4-trl p5-transformers p5-trl p1m-transformers
-```
-
-```powershell
-$LASTEXITCODE
-```
-Expected: 12 rows `match`, then `0`. Close other large programs first: P1M runs three Python
-processes at once, and the first attempt on the primary laptop (7.3 GB of memory) ran out of
-memory.
-
 ## Step 11: Send the results back
 
 ```powershell
-Get-ChildItem bank\results -Directory | Sort-Object LastWriteTime | Select-Object -Last 3 Name
+Get-ChildItem bank\results -Directory | Sort-Object LastWriteTime | Select-Object -Last 2 Name
 ```
 
 ```powershell
-$new = Get-ChildItem bank\results -Directory | Sort-Object LastWriteTime | Select-Object -Last 3; Compress-Archive -Path $new.FullName -DestinationPath $HOME\Desktop\g4_second_machine.zip
+$new = Get-ChildItem bank\results -Directory | Sort-Object LastWriteTime | Select-Object -Last 2; Compress-Archive -Path $new.FullName -DestinationPath $HOME\Desktop\g4_second_machine.zip
 ```
 
-(Three folders: the controls, the bank, and the M4 controls.)
+(Two folders: the controls and the bank.)
 
 Move `g4_second_machine.zip` to the primary computer (USB, email or other transfer) and
 report where it was saved. It is then extracted into a new folder,
@@ -168,9 +158,11 @@ python scripts\compare_results.py bank\results\<primary folder> bank\results\sec
 
 | Second-machine folder | Compare with (primary) | Runs | Closes |
 |---|---|---|---|
-| `controls_…` (Step 10, first command) | `controls_2026-11-01_104321` | 24 | G4 (and the v0.1 controls) |
-| `<date>_<time>` (Step 10, bank) | the latest full bank run | 10 or more | G4 |
-| `controls_…` (Step 10, M4 command) | `controls_2026-11-01_171529` | 12 | M4's stability threshold |
+| `controls_…` (Step 10, controls) | `controls_2026-11-06_224308` | 36 | G4 (v0.1 controls) and M4's stability threshold |
+| `<date>_<time>` (Step 10, bank) | `2026-11-06_223912` | 12 | G4 |
+
+(Both primary folders were made on 2026-11-06 with P1's current noise floor; results from
+before that date used the previous floor and are not the baseline.)
 
 **Known borderline runs (recorded 2026-11-01, before any second-computer run).** On this
 computer, changing only the CPU thread count moved `p1-trl` on SmolLM2 from info to pass;
@@ -179,6 +171,14 @@ computer with a different number of cores may therefore report `DIFFERENT` for t
 runs (pass ↔ info), never near the fail line. The criterion above is not changed; how such
 a difference is counted is the owner's decision (`docs/m0_findings.md`, "Extra
 single-computer evidence for G4").
+
+**Update 2026-11-06.** P1's noise floor now samples the batchings the trainers use and
+several CPU thread counts (`docs/m0_findings.md`, "Option A"). On this computer the six P1
+controls now give the same verdict (pass) at 6 threads and at 1 thread; the largest
+P1-on-TRL ratio at seed 0 is 1.73× (SmolLM2). A difference on a second computer is now much
+less likely but not impossible. **The comparison baseline for the P1 controls is
+therefore the new results**, `controls_2026-11-06_224308` (all 36 controls); the earlier
+folders were made with the previous floor.
 
 Simpler alternative for Step 7: `& $HOME\.venvs\conform\Scripts\python.exe scripts\setup_bank_envs.py`
 creates the bank environments and checks them against their lists in one command.

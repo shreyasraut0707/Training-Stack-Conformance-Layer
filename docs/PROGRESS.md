@@ -9,14 +9,14 @@ Status as of 2026-11-04.
 
 | Milestone | Exit criterion (spec) | Status | What is met | What is missing |
 |---|---|---|---|---|
-| **M0 Spike** | G1–G4 met | **Not complete: conditional go** | G1 (3 of 3 cases detected), G2 (0 fails at fixed pins), G3 (0 fails in controls, three tokenizer families), G4 10 repeats identical on this machine (220 of 220); extra same-computer evidence: a fresh environment from the lockfile reproduces every verdict and number, one CPU thread changes 1 of 72 verdicts (borderline P1-on-TRL runs recorded) | G4's **second-machine spot check: pending**. The owner has one computer, so it cannot be done now; it is not replaced by a virtual machine or by CI |
+| **M0 Spike** | G1–G4 met | **Not complete: conditional go** | G1 (3 of 3 cases detected), G2 (0 fails at fixed pins), G3 (0 fails in controls, three tokenizer families), G4 10 repeats identical on this machine (220 of 220); extra same-computer evidence: a fresh environment from the lockfile reproduces every verdict and number, one CPU thread changes 1 of 72 verdicts (borderline P1-on-TRL runs recorded); **after P1's wider noise floor (2026-11-06)** the P1 controls give the same verdicts on 1 thread and 6 threads, 10 repeats stable again (P1 controls and P1 bank cases) | G4's **second-machine spot check: pending**. The owner has one computer, so it cannot be done now; it is not replaced by a virtual machine or by CI |
 | **M1 v0.1** | all v0.1 probes pass their own unit tests and run on CPU against the current stable release | **Complete (0.1.0)** | P1, P2, P3, P6, P7, CLI, JSON / Markdown / JUnit reports, proxy factory for Llama- and Qwen-type families; tests pass; controls 24 of 24 on transformers 5.22.1 / trl 1.17.1 | — |
 | **M2 Bank** | detection and false-positive results published, including cases the probes missed | **Complete** (exit criterion met) | `docs/bank_results.md` (4 of 4 historical case checks detected, 0 fails at fixed pins, misses listed; case C confirmed upstream by PR 46204); calibration done (fail 10× confirmed, pass band 2× kept by decision); mutation suite 49 of 49 applicable; hash-pinned lockfiles; **CI matrix ran on GitHub: all jobs green** (run 41326929545: 122 tests, 72 control runs with 0 fails, bank 12 of 12 identical to this computer); **weekly upstream run** works (first run 41328069985 on transformers 5.23.0.dev0 / trl 1.18.0.dev0: 36 controls, 0 fails; scheduled Mondays 06:00 UTC) | — |
 | **M3 Agents** | a clean install and a `diagnose` run work end to end in both agents | **Complete** (2026-11-04) | clean install of the built wheel verified in a fresh environment (command, skill, MCP server); MCP client ran `diagnose` end to end over stdio (test passes); skill, `conform setup` (plan, `--apply`, backups), release workflow with Trusted Publishing, `SECURITY.md`; **Claude Code check passed 2026-11-03**; **Codex check passed 2026-11-03** (development install); **clean-install runs 2026-11-04** (`conform-clean`, wheel `f04d00c9…`): one Claude Code run and one Codex run with only the standard request each met all four pass conditions (evidence in the log below) | — |
 | **M4 v0.2** | new probes meet the same stability and control thresholds as v0.1 | **Not complete: met on one machine** | P4, P5, P1M built and tested; controls 12 runs × 10 repeats, 120 of 120 match, identical verdicts, spread 0 (`controls_2026-11-01_171529/`); the same 12 identical in a fresh lockfile environment and on one CPU thread; DPO decision recorded (out of scope until a confirmed DPO bug) | the v0.1 stability threshold includes a **second-machine spot check: pending** (one computer only) |
 
-Tests: **125 pass** (124 in the main environment, plus the MCP end-to-end test in
-`conform-agent`; 2026-11-04). Against the installed wheel (`conform-clean`): 115 pass; the
+Tests: **126 pass** (125 in the main environment, plus the MCP end-to-end test in
+`conform-agent`; 2026-11-06). Against the installed wheel (`conform-clean`): 115 pass; the
 other 5 need the repository's own files (bank, controls, scripts). Version: **0.2.0.dev0** (pre-release; 0.1.0 is the completed M1).
 Final report: `docs/COMPLETION_REPORT.md`.
 
@@ -31,11 +31,12 @@ Final report: `docs/COMPLETION_REPORT.md`.
 4. **Final name:** `conform` is taken on PyPI and GitHub; `training-stack-conform` and
    `conform-probes` are free on PyPI today (`docs/publishing_steps.md`). No upload is
    possible until this is decided.
-5. **Borderline P1-on-TRL runs (G4):** they move between pass and unknown with the CPU
-   thread count and on GitHub's runners (TinyLlama 1.96× → 3.55×). The spec counts any
-   changed verdict as a probe defect (Section 10.2, step 2). Recommended: option A, fix the
-   probe's noise floor for TRL's kernel without changing 2× / 10×; alternatives B and C in
-   `docs/m0_findings.md`, "G4 against the spec's text". Nothing changed until you decide.
+5. ~~Borderline P1-on-TRL runs (G4)~~: **option A chosen and done 2026-11-06.** P1's
+   noise floor now samples the trainers' batchings and several CPU thread counts (P1's own
+   maths; thresholds unchanged). The P1 controls now give the same verdicts at 6 threads and
+   at 1 thread, and correct TRL runs peak at 2.10× (was 3.82×). Residual: a P1-on-TRL run
+   near 2× can still read differently on another computer; if that happens at the
+   second-computer check, options B and C (`docs/m0_findings.md`) come back to you.
 6. **When the repository becomes public** (recommended: just before the first real release,
    after contacting maintainers; `docs/publishing_steps.md`, Step B).
 
@@ -370,4 +371,20 @@ Final report: `docs/COMPLETION_REPORT.md`.
   items exist: MCP server, skill, `conform setup` for both agents, the Trusted Publishing
   release workflow (built; not run, since nothing is published without the owner's
   approval) and the official-sources notice (`SECURITY.md`).
+- 2026-11-06: **option A done: P1's noise floor widened** (owner's choice). Prototypes
+  first (scratch scripts; nothing changed in the project): a floor through TRL's own fused
+  log-prob head was rejected (bit-for-bit the trainer's computation, every ratio 1.00×);
+  unpadded and one-batch samples helped but left Qwen2.5 flipping; chunked log-softmax added
+  little; sampling those batchings at 1, 2, 4 and the default thread count cut TRL unknowns
+  from 12 to 1 of 30 runs and thread-dependent verdicts from 8 to 1 of 15 model-seed pairs.
+  Implemented: `measure_floor(..., arrangements=..., sample_threads=True)` (P1 only; P1M
+  unchanged; the oracle's own maths; thread count restored), P1 records `floor_samples`,
+  limits reworded; new test `test_wider_floor_samples_more_and_restores_the_thread_count`.
+  Evidence, one job at a time, all exit 0: tests 125 + MCP 1; calibration (TRL largest
+  2.10×, was 3.82×; Transformers 0.82×, was 1.06×; defect detection unchanged); mutations
+  49 of 49 applicable, identical; bank 12 of 12 identical; controls 0 fails, 34 of 36
+  identical, `p1-trl` SmolLM2 and Qwen2.5 unknown → pass; one thread: P1 verdicts identical
+  to six threads; 10 repeats stable (P1 controls; P1 bank cases). Details:
+  `docs/m0_findings.md`, "Option A"; `docs/calibration.md`. G4's second-computer check
+  stays pending; its baselines are now the 2026-11-06 folders.
 

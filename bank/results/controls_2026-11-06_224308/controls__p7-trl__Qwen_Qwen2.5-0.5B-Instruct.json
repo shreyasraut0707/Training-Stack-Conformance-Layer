@@ -1,0 +1,125 @@
+{
+  "probe": "P7-eos-stopping",
+  "status": "pass",
+  "oracle": "behaviour: EOS probability at the end of each completion before and after a short fine-tune, on the saved and reloaded model, and a bounded greedy generate call",
+  "environment": {
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26300-SP0",
+    "torch": "2.15.0+cpu",
+    "transformers": "5.22.1",
+    "trl": "1.17.1",
+    "peft": "0.21.2",
+    "accelerate": "1.15.0",
+    "datasets": "5.1.0",
+    "device": "cpu",
+    "dtype": "float32",
+    "seeds": {
+      "proxy": 0,
+      "trainer": 0
+    }
+  },
+  "reproducer": "python -m conform.probes.p7_eos_stop Qwen/Qwen2.5-0.5B-Instruct --trainer trl --data-format prompt_completion --seed 0",
+  "findings": [
+    {
+      "evidence_class": "seen",
+      "claim": "EOS probability at the end of the completion: 7.36e-06 before, 0.995 after the fine-tune (mean of 4 samples)",
+      "evidence": {
+        "before": 7.363443046415341e-06,
+        "after": 0.9953456521034241
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "Greedy generation from the reloaded model stopped in 4 of 4 prompts (stop tokens [151643, 151645] from the model's generation_config.json)",
+      "evidence": {
+        "stopped": 4,
+        "prompts": 4,
+        "stop_ids": [
+          151643,
+          151645
+        ]
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "Probability of the completions' own tokens: 6.74e-06 before, 0.99 after",
+      "evidence": {
+        "before": 6.7429172780802696e-06,
+        "after": 0.9904469275048801
+      },
+      "rule": null
+    }
+  ],
+  "observed": {
+    "trainer": "TRL SFTTrainer",
+    "data_format": "prompt_completion",
+    "proxy": {
+      "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+      "model_type": "qwen2",
+      "revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+      "vocab_size": 151936,
+      "tokenizer_len": 151665,
+      "num_hidden_layers": 2,
+      "hidden_size": 64,
+      "seed": 0,
+      "pad_token_id": 151643,
+      "eos_token_id": 151645,
+      "bos_token_id": null,
+      "pad_equals_eos": false
+    },
+    "before": {
+      "eos_probability": 7.363443046415341e-06,
+      "content_probability": 6.7429172780802696e-06,
+      "samples": 4
+    },
+    "after": {
+      "eos_probability": 0.9953456521034241,
+      "content_probability": 0.9904469275048801,
+      "samples": 4
+    },
+    "generations": [
+      {
+        "budget": 14,
+        "new_tokens": 6,
+        "stopped": true,
+        "stopped_after": 6
+      },
+      {
+        "budget": 15,
+        "new_tokens": 7,
+        "stopped": true,
+        "stopped_after": 7
+      },
+      {
+        "budget": 11,
+        "new_tokens": 3,
+        "stopped": true,
+        "stopped_after": 3
+      },
+      {
+        "budget": 16,
+        "new_tokens": 8,
+        "stopped": true,
+        "stopped_after": 8
+      }
+    ],
+    "stop_ids": [
+      151643,
+      151645
+    ],
+    "generation_settings": "the model's generation_config.json",
+    "steps": 60,
+    "learning_rate": 0.005,
+    "unsupported_trainer_options": []
+  },
+  "noise_floor": null,
+  "declared_intent": null,
+  "limitations": [
+    "proxy model; real weights not used, so a short fine-tune stands in for a real one",
+    "training budget fixed by the probe (60 steps at learning rate 0.005, constant); the recipe's other trainer settings apply",
+    "generation is greedy (do_sample=False) for determinism; the saved generation settings' stop tokens and other options apply"
+  ],
+  "reason": null
+}

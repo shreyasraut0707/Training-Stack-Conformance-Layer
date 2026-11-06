@@ -1,0 +1,132 @@
+{
+  "probe": "P7-eos-stopping",
+  "status": "fail",
+  "oracle": "behaviour: EOS probability at the end of each completion before and after a short fine-tune, on the saved and reloaded model, and a bounded greedy generate call",
+  "environment": {
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26300-SP0",
+    "torch": "2.6.0",
+    "transformers": "4.50.3",
+    "trl": "0.16.0",
+    "peft": null,
+    "accelerate": "1.6.0",
+    "datasets": "3.6.0",
+    "device": "cpu",
+    "dtype": "float32",
+    "seeds": {
+      "proxy": 0,
+      "trainer": 0
+    }
+  },
+  "reproducer": "python -m conform.probes.p7_eos_stop HuggingFaceTB/SmolLM2-135M-Instruct --trainer trl --data-format messages --seed 0",
+  "findings": [
+    {
+      "evidence_class": "seen",
+      "claim": "EOS probability at the end of the completion: 1.93e-05 before, 5.4e-08 after the fine-tune (mean of 4 samples)",
+      "evidence": {
+        "before": 1.9284743757452816e-05,
+        "after": 5.404746783455039e-08
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "Greedy generation from the reloaded model stopped in 0 of 4 prompts (stop tokens [2] from the model's generation_config.json)",
+      "evidence": {
+        "stopped": 0,
+        "prompts": 4,
+        "stop_ids": [
+          2
+        ]
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "Probability of the completions' own tokens: 1.71e-05 before, 0.981 after",
+      "evidence": {
+        "before": 1.7095006160161575e-05,
+        "after": 0.9811199122241565
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "The saved and reloaded model did not learn to stop: EOS probability did not rise",
+      "evidence": {
+        "eos_rose": false,
+        "all_stopped": false
+      },
+      "rule": null
+    }
+  ],
+  "observed": {
+    "trainer": "TRL SFTTrainer",
+    "data_format": "messages",
+    "proxy": {
+      "model_id": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "model_type": "llama",
+      "revision": "12fd25f77366fa6b3b4b768ec3050bf629380bac",
+      "vocab_size": 49152,
+      "tokenizer_len": 49152,
+      "num_hidden_layers": 2,
+      "hidden_size": 64,
+      "seed": 0,
+      "pad_token_id": 2,
+      "eos_token_id": 2,
+      "bos_token_id": 1,
+      "pad_equals_eos": true
+    },
+    "before": {
+      "eos_probability": 1.9284743757452816e-05,
+      "content_probability": 1.7095006160161575e-05,
+      "samples": 4
+    },
+    "after": {
+      "eos_probability": 5.404746783455039e-08,
+      "content_probability": 0.9811199122241565,
+      "samples": 4
+    },
+    "generations": [
+      {
+        "budget": 14,
+        "new_tokens": 14,
+        "stopped": false,
+        "stopped_after": null
+      },
+      {
+        "budget": 15,
+        "new_tokens": 15,
+        "stopped": false,
+        "stopped_after": null
+      },
+      {
+        "budget": 11,
+        "new_tokens": 11,
+        "stopped": false,
+        "stopped_after": null
+      },
+      {
+        "budget": 16,
+        "new_tokens": 16,
+        "stopped": false,
+        "stopped_after": null
+      }
+    ],
+    "stop_ids": [
+      2
+    ],
+    "generation_settings": "the model's generation_config.json",
+    "steps": 60,
+    "learning_rate": 0.005,
+    "unsupported_trainer_options": []
+  },
+  "noise_floor": null,
+  "declared_intent": null,
+  "limitations": [
+    "proxy model; real weights not used, so a short fine-tune stands in for a real one",
+    "training budget fixed by the probe (60 steps at learning rate 0.005, constant); the recipe's other trainer settings apply",
+    "generation is greedy (do_sample=False) for determinism; the saved generation settings' stop tokens and other options apply"
+  ],
+  "reason": null
+}

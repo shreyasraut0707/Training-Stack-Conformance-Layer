@@ -1,0 +1,162 @@
+{
+  "probe": "P6-precision",
+  "status": "info",
+  "oracle": "observation only: dtypes seen during and after one real training step",
+  "environment": {
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26300-SP0",
+    "torch": "2.15.0+cpu",
+    "transformers": "5.22.1",
+    "trl": "1.17.1",
+    "peft": "0.21.2",
+    "accelerate": "1.15.0",
+    "datasets": "5.1.0",
+    "device": "cpu",
+    "dtype": "library default",
+    "seeds": {
+      "proxy": 0,
+      "trainer": 0
+    }
+  },
+  "reproducer": "python -m conform.probes.p6_precision Qwen/Qwen2.5-0.5B-Instruct --trainer trl --data-format prompt_completion --seed 0",
+  "findings": [
+    {
+      "evidence_class": "seen",
+      "claim": "Precision settings: bf16=True (library default), fp16=False (library default), tf32=None (library default)",
+      "evidence": {
+        "settings": {
+          "bf16": {
+            "value": true,
+            "source": "library default"
+          },
+          "fp16": {
+            "value": false,
+            "source": "library default"
+          },
+          "tf32": {
+            "value": null,
+            "source": "library default"
+          }
+        }
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "Parameters after one step are float32",
+      "evidence": {
+        "parameters": [
+          "float32"
+        ]
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "Linear layers computed in bfloat16",
+      "evidence": {
+        "compute": [
+          "bfloat16"
+        ]
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "Gradients are float32",
+      "evidence": {
+        "gradients": [
+          "float32"
+        ]
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "Optimizer AdamW keeps its state in float32",
+      "evidence": {
+        "optimizer": "AdamW",
+        "optimizer_state": [
+          "float32"
+        ]
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "Mixed precision: computation runs in bfloat16 while parameters are stored in float32",
+      "evidence": {
+        "compute": [
+          "bfloat16"
+        ],
+        "parameters": [
+          "float32"
+        ]
+      },
+      "rule": null
+    },
+    {
+      "evidence_class": "seen",
+      "claim": "Turned on by the library default, not by the recipe: bf16",
+      "evidence": {
+        "silent_defaults": [
+          "bf16"
+        ]
+      },
+      "rule": null
+    }
+  ],
+  "observed": {
+    "trainer": "TRL SFTTrainer",
+    "proxy": {
+      "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+      "model_type": "qwen2",
+      "revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+      "vocab_size": 151936,
+      "tokenizer_len": 151665,
+      "num_hidden_layers": 2,
+      "hidden_size": 64,
+      "seed": 0,
+      "pad_token_id": 151643,
+      "eos_token_id": 151645,
+      "bos_token_id": null,
+      "pad_equals_eos": false
+    },
+    "settings": {
+      "bf16": {
+        "value": true,
+        "source": "library default"
+      },
+      "fp16": {
+        "value": false,
+        "source": "library default"
+      },
+      "tf32": {
+        "value": null,
+        "source": "library default"
+      }
+    },
+    "parameters": [
+      "float32"
+    ],
+    "compute": [
+      "bfloat16"
+    ],
+    "gradients": [
+      "float32"
+    ],
+    "optimizer": "AdamW",
+    "optimizer_state": [
+      "float32"
+    ],
+    "unsupported_trainer_options": []
+  },
+  "noise_floor": null,
+  "declared_intent": null,
+  "limitations": [
+    "proxy model built in float32 and passed as an object, so a trainer's own model-loading dtype default (when given a model name) is not observed",
+    "CPU only; GPU kernels and their precision behaviour are not tested",
+    "observation only: P6 never fails"
+  ],
+  "reason": null
+}

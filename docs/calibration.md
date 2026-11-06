@@ -81,3 +81,25 @@ explained), and revisit with the third option. The decision is the owner's.
 multiplier is confirmed by this calibration; the pass band is kept deliberately, so TRL's
 unmodelled float32 rounding continues to read as unknown rather than pass. Revisit when the
 floor can sample the trainer's own kernel rounding.
+
+## 2026-11-06: a wider floor (option A; thresholds unchanged)
+
+The "third option" above was taken up, in a form that keeps the floor independent of the
+library. Sampling the floor through TRL's own fused log-prob head was tried and **rejected**:
+it is bit-for-bit the trainer's own computation (every ratio exactly 1.00×), so it could
+never see anything wrong with it. Instead P1's floor now also samples, with the oracle's own
+float32 maths, the batchings the trainers use (unpadded rows, all rows in one batch) and
+every float32 sample at 1, 2, 4 and the default number of CPU threads (details:
+`docs/m0_findings.md`, "Option A"). Data: `bank/results/calibration_2026-11-06_223241/`.
+
+| | Previous floor | Wider floor |
+|---|---|---|
+| Correct Transformers runs, largest ratio | 1.06× | **0.82×** |
+| Correct TRL runs, largest ratio | 3.82× | **2.10×** (one run; the rest below 2×) |
+| Injected loss-scale defects | ε = 10⁻⁵ at 84×, 10⁻³ at 8388× | **the same** (caught through the loss check, whose floor is float32's resolution) |
+| Mutation suite | 49 of 49 applicable | **49 of 49** |
+| Historical cases A and C | fail at the defective pins | **fail**; fixed pins pass |
+
+The pass band (2×) and fail multiplier (10×) are unchanged. Margin of the worst correct
+stack under the fail line: 4.8× (was 2.6×). TRL's kernel still rounds at up to about 2× an
+independent floor, so a P1-on-TRL run can still read as unknown near the line.

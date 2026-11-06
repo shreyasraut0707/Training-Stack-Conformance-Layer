@@ -36,6 +36,14 @@ them); cases B and C differ only in the library under test. See `docs/m0_go_no_g
 The bank itself also ran on GitHub's Windows runner: **12 of 12 verdicts identical** to this
 computer (CI run 41326929545).
 
+**P1's wider noise floor (2026-11-06).** Rerun of everything P1 touches with the new floor
+(`docs/m0_findings.md`, "Option A"): bank 12 of 12 verdicts identical
+(`2026-11-06_223912/`); controls 36 runs, 0 fails, 34 identical, with `p1-trl` on SmolLM2
+and Qwen2.5 moving from unknown to pass as intended (`controls_2026-11-06_224308/`); the
+six P1 controls give the same verdicts on one CPU thread (`controls_2026-11-06_225219/`);
+10 repeats stable for the P1 controls and the P1 bank cases (`controls_2026-11-06_225344/`,
+`2026-11-06_230856/`); mutation suite 49 of 49 applicable. These are now the baseline.
+
 The last three rows are extra evidence from the same computer or from cloud virtual
 machines, **not** the second-computer spot check (still pending). They show that the thread count moves P1-on-TRL's numbers
 across the 2× pass band for some models, never near the 10× fail line (details in

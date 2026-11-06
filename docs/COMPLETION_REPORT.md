@@ -6,7 +6,7 @@ Date: 2026-11-04 · Version: 0.2.0.dev0 · Source of truth:
 ## Bottom line
 
 **The project is not yet complete by the spec's acceptance criteria.** Everything that can
-be built and verified on this computer is done and tested (125 tests pass). One
+be built and verified on this computer is done and tested (126 tests pass). One
 acceptance check remains open: the **second-computer spot check** (M0's G4 and M4's
 stability threshold) is **pending**: the owner has only one computer, and it has not been
 replaced by a virtual machine, by CI or by more runs on this computer. **M3 is complete**
@@ -72,6 +72,10 @@ CI and release workflows; hash-pinned lockfiles; security notice.
   trl 1.18.0.dev0) passed: 36 controls, 0 fails, no verdict needing triage.
 - **Injected defects:** 49 of 49 applicable caught (a first run's 2 misses were a fault in
   the injected defect, published in `docs/bank_results.md`).
+- **P1's wider noise floor (2026-11-06):** the floor now also samples the batchings the
+  trainers use and several CPU thread counts, with P1's own maths. Correct TRL runs peak at
+  2.10× (was 3.82×); the six P1 controls give the same verdicts on 1 and 6 threads; bank,
+  mutation suite and defect detection unchanged; 10 repeats stable; thresholds unchanged.
 - **Inside Claude Code (M3, 2026-11-03):** in a new Code-tab session of the Claude desktop
   app (model Claude Opus 5.5) in the test folder, the agent called `diagnose` (no-stop,
   `sft.yaml`) on the `conform` MCP server without running Python, reported P7, P2 and P3
@@ -121,7 +125,7 @@ CI and release workflows; hash-pinned lockfiles; security notice.
 
 ## Tests
 
-125 automated tests pass (124 in the main environment, 1 MCP end-to-end test in
+126 automated tests pass (125 in the main environment, 1 MCP end-to-end test in
 `conform-agent`), covering every probe, its injected defects, the reports, the CLI, the
 bank runner, setup and the comparison tool. Run against the installed wheel instead of the
 source tree, 115 pass; the other 5 test repository-only parts (bank cases, controls file,
@@ -135,11 +139,10 @@ codex` broke on Windows paths (regression test added; it fails on the old code).
 - Proxy models only: no real weights, so failures that need trained weights are not seen.
 - CPU only: GPU kernels, mixed-precision GPU paths, DeepSpeed, FSDP and multi-GPU are not
   tested (P1M covers two CPU processes).
-- P1's pass band (2×) lets TRL's float32 kernel rounding read as unknown (by decision).
-  Across machines and thread counts, three P1-on-TRL runs move between pass and unknown;
-  under the spec's rule ("any verdict that changes counts as a defect in the probe") this
-  is a P1-on-TRL stability defect awaiting your decision (recommended: fix the probe's
-  noise floor; thresholds unchanged).
+- P1 on TRL: the floor uses only P1's own maths, and TRL's float32 log-prob kernel rounds at
+  up to about 2× of it (one of 30 correct runs at 2.10×), so a P1-on-TRL run near the 2×
+  pass band can still read as unknown, and could read differently on another computer. The
+  wider floor (2026-11-06) removed the thread-count flips seen on this computer.
 - Case A's bank pair differs in 22 packages (cases B and C differ only in the library).
 - DPO and reinforcement-learning trainers are out of scope (DPO until a confirmed DPO bug).
 - Codex's configuration format and skill location: verified against a running Codex
@@ -171,8 +174,8 @@ codex` broke on Windows paths (regression test added; it fails on the old code).
 2. **Second-computer spot check** (closes M0's G4 and M4): pending while you have one
    computer; if you ever borrow another Windows computer for about two hours:
    `docs/g4_second_machine_steps.md`.
-3. **Decisions:** how to handle the borderline P1-on-TRL runs (options A, B, C in
-   `docs/m0_findings.md`; A recommended); contacting maintainers before public claims; the
+3. **Decisions:** (option A for the borderline P1-on-TRL runs was done on 2026-11-06; B or
+   C only if a second computer still disagrees); contacting maintainers before public claims; the
    first public artifact; when the repository becomes public. (`bank-ga-fixed` is kept
    until all final verification is complete, by your decision.)
 

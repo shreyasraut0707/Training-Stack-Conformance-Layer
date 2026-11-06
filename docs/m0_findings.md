@@ -353,3 +353,50 @@ not move (0.97× to 1.05× everywhere). Nothing changes on one machine with a fi
 
 Until decided, the comparison rule and thresholds are unchanged, and every report on these
 runs states the borderline.
+
+## 2026-11-06 · Option A: a wider noise floor for P1 (owner's choice)
+
+**What was tried (prototypes, scratch scripts; seed 0 unless stated).** Each P1-on-TRL
+run's largest deviation as a multiple of its floor:
+
+| Floor samples | SmolLM2 6 / 1 thr | Qwen2.5 6 / 1 thr | TinyLlama 6 / 1 thr | Verdict |
+|---|---|---|---|---|
+| Current (padded micro-batches; float64 reverse, float32 both orders) | 2.27 / 1.69 | 3.68 / 2.43 | 1.96 / 1.66 | — |
+| + TRL's own fused log-prob head | 1.00 / 1.00 | 1.00 / 1.00 | 1.00 / 1.00 | **rejected**: bit-for-bit the trainer's own computation, so it can never see anything wrong with it |
+| + unpadded rows and one batch (P1's own maths) | 1.73 / 1.69 | 1.45 / 2.42 | 1.48 / 1.66 | helps, Qwen still flips |
+| + log-softmax by 32768-token vocabulary chunks (P1's own code) | 1.71 / 1.27 | 1.45 / 1.92 | 1.19 / 1.01 | adds little; dropped |
+| **+ unpadded rows and one batch, each at 1, 2, 4 and the default threads** | **1.73 / 1.29** | **1.45 / 0.96** | **1.48 / 1.26** | **adopted** |
+
+Over 3 models × 5 seeds × the two thread settings (30 TRL runs): with the current floor, 12
+read unknown (largest 3.82×) and the verdict differed between 6 and 1 thread for 8 of 15
+model-seed pairs; with the adopted floor, 1 reads unknown (Qwen2.5, seed 4, 6 threads,
+2.10×) and 1 of 15 pairs differs. Transformers' largest ratio fell from 1.06× to 0.82×.
+
+**Cause found (inferred, rule: the samples that moved the ratios are the ones that change
+only the arithmetic order).** TRL's collator feeds each one-row micro-batch without padding
+(lengths 16, 12, 7, 4) and its one-batch run stacks the four rows; the floor sampled only
+padded single rows. And the number of CPU threads changes the order in which sums are
+added, which is what differs between computers; the floor sampled only the current setting.
+
+**Change.** `measure_floor` takes other batchings of the same rows and, on request, takes
+every float32 sample with 1, 2, 4 and the current number of threads (restored afterwards).
+P1 asks for both; P1M keeps its floor unchanged. Every sample is the oracle's own maths:
+no library code enters the floor, so a library defect cannot inflate it. Thresholds
+unchanged (2× / 10×). Each result records what the floor sampled (`floor_samples`).
+
+**Evidence (seen), 2026-11-06, this computer, one job at a time:**
+
+| Check | Result |
+|---|---|
+| Tests | 125 pass in the main environment, plus the MCP test in `conform-agent` |
+| Calibration (`calibration_2026-11-06_223241/`) | correct stacks, 3 models × 5 seeds: TRL largest **2.10×** (was 3.82×), Transformers **0.82×** (was 1.06×); injected loss-scale defects detected exactly as before (ε = 10⁻⁵ at 84×, 10⁻³ at 8388×), because they are caught through the loss check, whose floor is float32's resolution |
+| Mutation suite (`mutations_2026-11-06_223910/`) | identical to before: 49 of 49 applicable caught; every P1 mutant fails on both trainers and all three models |
+| Bank (`2026-11-06_223912/`) | 12 of 12 verdicts identical to before |
+| Controls (`controls_2026-11-06_224308/`) | 0 fails; 34 of 36 identical; the two changes are the intended ones: `p1-trl` on SmolLM2 and on Qwen2.5, unknown → **pass** |
+| One CPU thread (`controls_2026-11-06_225219/`) | the six P1 controls: all pass, the **same verdicts as with the default threads** (before: 2 of 6 differed or were unknown) |
+| G4, P1 controls × 10 (`controls_2026-11-06_225344/`) | stable: identical verdicts in all 10 repeats |
+| G4, P1 bank cases × 10 (`2026-11-06_230856/`) | stable: identical verdicts in all 10 repeats; defective pins fail, fixed pins pass |
+
+**What it does not settle.** TRL's own kernel still rounds at up to about 2× of an honest,
+independent floor (one Qwen2.5 seed at 2.10×), so a P1-on-TRL verdict near the line can
+still differ on another computer. The second-computer spot check (G4) remains **pending**.
