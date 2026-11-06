@@ -76,6 +76,9 @@ CI and release workflows; hash-pinned lockfiles; security notice.
   trainers use and several CPU thread counts, with P1's own maths. Correct TRL runs peak at
   2.10× (was 3.82×); the six P1 controls give the same verdicts on 1 and 6 threads; bank,
   mutation suite and defect detection unchanged; 10 repeats stable; thresholds unchanged.
+  On GitHub's Linux runners every verdict now matches this computer (36 of 36 controls,
+  pinned and latest; the bank 12 of 12 on the Windows runner), where one P1-on-TRL run
+  differed before (CI run 42267477781).
 - **Inside Claude Code (M3, 2026-11-03):** in a new Code-tab session of the Claude desktop
   app (model Claude Opus 5.5) in the test folder, the agent called `diagnose` (no-stop,
   `sft.yaml`) on the `conform` MCP server without running Python, reported P7, P2 and P3

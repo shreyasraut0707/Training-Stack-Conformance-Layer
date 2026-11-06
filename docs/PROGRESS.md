@@ -387,4 +387,9 @@ Final report: `docs/COMPLETION_REPORT.md`.
   to six threads; 10 repeats stable (P1 controls; P1 bank cases). Details:
   `docs/m0_findings.md`, "Option A"; `docs/calibration.md`. G4's second-computer check
   stays pending; its baselines are now the 2026-11-06 folders.
+- 2026-11-07: pushed as `81526dd` (code) and `540ec05` (evidence). CI run 42267477781:
+  **all jobs success**; against this computer's new baselines, Ubuntu controls 36 of 36
+  identical (pinned) and 36 of 36 (latest), Windows-runner bank 12 of 12. The TinyLlama
+  `p1-trl` run that read unknown on CI before (3.55×) now passes there (1.64×). Cloud
+  virtual machines: extra evidence, not the second-computer check.
 

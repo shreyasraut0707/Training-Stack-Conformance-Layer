@@ -397,6 +397,15 @@ unchanged (2× / 10×). Each result records what the floor sampled (`floor_sampl
 | G4, P1 controls × 10 (`controls_2026-11-06_225344/`) | stable: identical verdicts in all 10 repeats |
 | G4, P1 bank cases × 10 (`2026-11-06_230856/`) | stable: identical verdicts in all 10 repeats; defective pins fail, fixed pins pass |
 
+**On GitHub's runners (cloud virtual machines; not the second computer).** CI run
+42267477781 on `540ec05`: all jobs success. Compared with this computer's new baselines:
+controls on Ubuntu, pinned stack **36 of 36 verdicts identical**, latest releases **36 of
+36 identical**; bank on the Windows runner **12 of 12 identical**. Before the change the
+same comparison gave 35 of 36 (`p1-trl` TinyLlama pass → unknown, 1.96× → 3.55×); now
+TinyLlama reads pass at 1.64× there. Largest P1-on-TRL ratio on CI: 1.64× (laptop: 1.73×
+at 6 threads, 1.29× at 1 thread). The CI runners sampled 1, 2 and 4 threads (2 is their
+default).
+
 **What it does not settle.** TRL's own kernel still rounds at up to about 2× of an honest,
 independent floor (one Qwen2.5 seed at 2.10×), so a P1-on-TRL verdict near the line can
 still differ on another computer. The second-computer spot check (G4) remains **pending**.
