@@ -111,7 +111,10 @@ CI and release workflows; hash-pinned lockfiles; security notice.
   reports are identical and match the replies. Codex did not open the skill, so the tool's
   own description and note were enough. All four pass conditions met in both: **M3
   complete.** (Recorded by the Claude Code session that made its run, checked against
-  both session logs.)
+  both session logs; **independently re-verified on 2026-11-06** by the main development
+  session from both logs and both reports: exact standard prompts, one `diagnose` call
+  each, no Python, only the clean server reachable, all four conditions met. The release
+  workflow, an M3 scope item, is built but has not published anything, by your choice.)
 - **Notable facts about current libraries:** TRL turns bf16 mixed precision on by default;
   the standard Transformers collator with a PAD = EOS tokenizer trains a model that never
   stops (measured by P7); Transformers isolates packed documents on CPU.

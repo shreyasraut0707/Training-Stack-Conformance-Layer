@@ -48,7 +48,7 @@ Final report: `docs/COMPLETION_REPORT.md`.
 2. ~~Agent check (closes M3)~~: **done 2026-11-04.** On the rebuilt clean install, one
    Claude Code run and one Codex run in `C:\Users\Shreyas\conform-clean-test`, standard
    request only, each met all four pass conditions. M3 is complete (log entry "M3
-   complete", 2026-11-04).
+   complete", 2026-11-04; independently verified 2026-11-06).
 3. **PyPI and TestPyPI accounts and the final name** (before any upload):
    `docs/publishing_steps.md`, sections 1 and 3.
 4. **Maintainer contact and a user pilot**, if you choose to (`docs/publishing_steps.md`, section 4).
@@ -306,12 +306,6 @@ Final report: `docs/COMPLETION_REPORT.md`.
   `~/.agents/skills/conform/`); server registrations unchanged. Read back from the clean
   server: the `diagnose` description carries all four rules. Waiting for: one Claude Code
   run and one Codex run in `conform-clean-test`, standard request only.
-- 2026-11-06: committed and pushed to the private repository: `61f0fbe` (the Codex setup
-  fix, the MCP reporting rules, the skill, their tests) and `e1472ae` (this evidence).
-  Secret scan of the added lines: no credentials, e-mail addresses or account ids. CI run
-  42233477195 on `e1472ae`: **all jobs success** (tests pinned, tests latest, bank on
-  Windows). The weekly scheduled runs of 2026-11-02 also passed on their own: `ci` 41458170996
-  (bank) and `upstream` 41469630254.
 - 2026-11-04: **M3 complete.** The two runs left after the report-path fix, both in
   `C:\Users\Shreyas\conform-clean-test` with only the standard request, on the rebuilt
   clean install (`conform-clean`: wheel `f04d00c9…` installed at 00:37, before both runs;
@@ -344,4 +338,36 @@ Final report: `docs/COMPLETION_REPORT.md`.
     can confirm it from that session's first reply). Later turns in that session (the
     owner's follow-up questions: a read-only search for a training script, reading these
     documents) were not part of the check and ran no Python.
+- 2026-11-06: committed and pushed to the private repository: `61f0fbe` (the Codex setup
+  fix, the MCP reporting rules, the skill, their tests) and `e1472ae` (this evidence).
+  Secret scan of the added lines: no credentials, e-mail addresses or account ids. CI run
+  42233477195 on `e1472ae`: **all jobs success** (tests pinned, tests latest, bank on
+  Windows). The weekly scheduled runs of 2026-11-02 also passed on their own: `ci` 41458170996
+  (bank) and `upstream` 41469630254. **Correction:** `e1472ae`'s commit message says "M3 is
+  not marked complete", but the documents it committed already said complete (the entry
+  above, written on 2026-11-04 by the Claude Code test session); the message is wrong, the
+  documents are right (confirmed below). History was not rewritten.
+- 2026-11-06: **M3 complete: independently verified** (by the main development session,
+  from both agents' session logs and the report files, not from the agents' own accounts).
+  Claude Code (`150768fc-….jsonl`): the first message is exactly the standard request; the
+  `conform` skill loaded; `sft.yaml` read; one `mcp__conform__diagnose` call (`no-stop`,
+  `sft.yaml`); no Python; the reply labels every finding "seen", says "No finding came back
+  as unknown" and ends "Full report: …004230/report.md". The test part of the session
+  (up to the reply, 19:12:48 UTC) mentions `conform-clean` 69 times and `conform-agent`
+  never (its later mentions start at 19:17:30, in the folder search). Codex
+  (`rollout-2026-11-04T00-42-57-….jsonl`): one message, exactly the standard request; one
+  PowerShell file check and one `diagnose` call (`no-stop`, `sft.yaml`); no Python; the
+  result began with the note and held the per-class counts; the reply gives "Evidence class
+  **seen**" for P7, P2 and P3, "no unknown findings" and "Full report: …004406\report.md";
+  `conform-clean` 59 mentions, `conform-agent` none. Both agents could reach only the clean
+  server (folder `.mcp.json`; nothing in `~/.claude.json`; `~/.codex/config.toml`
+  unchanged since 23:56:18), which ran wheel `f04d00c9…` (installed 00:37, before both
+  runs). Reports `…_004230` and `…_004406`: 3 pass, every finding seen, results identical to
+  every earlier run. Against the spec: the exit criterion (Section 11.1, "a clean install
+  and a `diagnose` run work end to end in both agents") is met, and so is the intended
+  session (Section 9, Figure 9: the tool picked, the related probes run, a short summary
+  with the report path, what was seen, inferred and unknown, no claim of harm). M3's scope
+  items exist: MCP server, skill, `conform setup` for both agents, the Trusted Publishing
+  release workflow (built; not run, since nothing is published without the owner's
+  approval) and the official-sources notice (`SECURITY.md`).
 
