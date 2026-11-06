@@ -306,6 +306,12 @@ Final report: `docs/COMPLETION_REPORT.md`.
   `~/.agents/skills/conform/`); server registrations unchanged. Read back from the clean
   server: the `diagnose` description carries all four rules. Waiting for: one Claude Code
   run and one Codex run in `conform-clean-test`, standard request only.
+- 2026-11-06: committed and pushed to the private repository: `61f0fbe` (the Codex setup
+  fix, the MCP reporting rules, the skill, their tests) and `e1472ae` (this evidence).
+  Secret scan of the added lines: no credentials, e-mail addresses or account ids. CI run
+  42233477195 on `e1472ae`: **all jobs success** (tests pinned, tests latest, bank on
+  Windows). The weekly scheduled runs of 2026-11-02 also passed on their own: `ci` 41458170996
+  (bank) and `upstream` 41469630254.
 - 2026-11-04: **M3 complete.** The two runs left after the report-path fix, both in
   `C:\Users\Shreyas\conform-clean-test` with only the standard request, on the rebuilt
   clean install (`conform-clean`: wheel `f04d00c9…` installed at 00:37, before both runs;
